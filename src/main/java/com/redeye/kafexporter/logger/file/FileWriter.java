@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import com.redeye.kafexporter.Config;
-import com.redeye.kafexporter.logger.logger.LogWriter;
+import com.redeye.kafexporter.logger.LogWriter;
 
 /**
  * 파일 로그 Writer

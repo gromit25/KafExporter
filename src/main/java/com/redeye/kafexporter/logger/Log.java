@@ -9,9 +9,8 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.redeye.appagent.Config;
-import com.redeye.appagent.builtins.ContentsApp;
-import com.redeye.appagent.util.StringUtil;
+import com.redeye.kafexporter.Config;
+import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.textgen.TextGen;
 
 /**
@@ -242,25 +241,14 @@ public class Log {
 	private static String genLogMsg(
 		String apiType,
 		Object obj,
-		long elapsedTime,
-		String logFormat,
-		Object[] params
+		String logFormat
 	) {
 		
 		// 현재시간을 가져옴
-		long curTime = System.currentTimeMillis();
-		
-		// 트랜잭션 ID가 없으면 만듦
-		if(ContentsApp.getTxId() == null) {
-			String newTxId = System.currentTimeMillis() + "_" + Thread.currentThread().getId();
-			ContentsApp.setTxId(newTxId);
-		}
+		long timestamp = System.currentTimeMillis();
 		
 		// 호출API별메시지 조립
 		String logMsg = logFormat;
-		if(params != null && params.length > 0) {
-			logMsg = String.format(logMsg, params);
-		}
 		
 		// 객체식별자를 만듦
 		String objId = makeObjId(obj);
@@ -271,11 +259,9 @@ public class Log {
 		// 로그 템플릿에서 사용할 데이터 설정
 		Map<String, Object> valueMap = new HashMap<>();
 		
-		valueMap.put("curTime", Long.toString(curTime));
-		valueMap.put("elapsedTime", (Long)elapsedTime);
+		valueMap.put("timestamp", Long.toString(timestamp));
 		valueMap.put("pid", Config.SYSTEM_PID.getValue());
-		valueMap.put("txId", ContentsApp.getTxId());
-		valueMap.put("apiType", apiType);
+		valueMap.put("type", type);
 		valueMap.put("objId", objId);
 		valueMap.put("message", logMsg);
 		valueMap.put("stackTrace", stackTraceMsg);
@@ -293,8 +279,8 @@ public class Log {
 			log = Config.LOG_TEMPLATE_FAIL_MESSAGE.getValue();
 		}
 		
-		// 로그 종료 문자열([ASCII 코드 RS(Record Separator)] + "\r\n") 추가
-		log += "\u001E\r\n";
+		// 로그 종료 문자열("\r\n") 추가
+		log += "\r\n";
 		
 		return log;
 	}
