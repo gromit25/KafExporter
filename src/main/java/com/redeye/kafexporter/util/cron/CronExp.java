@@ -7,9 +7,9 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.redeye.kafexporter.util.CommonUtil;
 import com.redeye.kafexporter.util.DateUtil;
 import com.redeye.kafexporter.util.StringUtil;
+import com.redeye.kafexporter.util.TypeUtil;
 
 import lombok.Getter;
 
@@ -88,7 +88,7 @@ public class CronExp {
 					timeList.add(time);
 				}
 				
-				return CommonUtil.toIntArray(timeList);
+				return TypeUtil.toIntArray(timeList);
 			}
 			
 		},
@@ -125,7 +125,7 @@ public class CronExp {
 					timeList.add(index);
 				}
 				
-				return CommonUtil.toIntArray(timeList);
+				return TypeUtil.toIntArray(timeList);
 			}
 		},
 		
@@ -160,7 +160,7 @@ public class CronExp {
 					}
 				}
 				
-				return CommonUtil.toIntArray(timeList);
+				return TypeUtil.toIntArray(timeList);
 			}
 			
 		};
