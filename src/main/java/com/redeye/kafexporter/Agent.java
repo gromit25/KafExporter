@@ -20,10 +20,10 @@ public class Agent {
 	public static void premain(String args, Instrumentation inst) {
 		
 		// 수집 주기 설정
-		String period = System.getenv("KAFKA_EXPORTER_PERIOD");
-		if(period == null) {
+		String portNumStr = System.getenv("KAF_EXPORTER_PORT");
+		if(portNumStr == null) {
 			// 환경변수가 없는 경우 디폴트 값 설정
-			period = "*/10 * * * * *";
+			portNumStr = "1234";
 		}
 		
 		// 수집기 기동

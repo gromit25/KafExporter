@@ -34,21 +34,6 @@ public class AcquireJob {
 			//
 			init(inst);
 			
-			// 수집 크론 잡 생성 및 실행
-			CronJob job = new CronJob(
-				period,
-				() -> {
-					
-					try {
-						acquire();
-					} catch(Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			);
-			
-			job.run();
-			
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
