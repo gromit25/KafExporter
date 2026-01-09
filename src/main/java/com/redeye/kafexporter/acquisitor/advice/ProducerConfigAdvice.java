@@ -15,7 +15,16 @@ public class ProducerConfigAdvice {
 	
 	/** */
 	private static Map<String, Map<String, Object>> configMap = new ConcurrentHashMap<>();
-	
+
+
+	/**
+	 *
+	 *
+	 * @param configMap
+	 */
+	public static void init(Map<String, Map<String, Object>> configMap) {
+		this.configMap = configMap;
+	}
 	
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
