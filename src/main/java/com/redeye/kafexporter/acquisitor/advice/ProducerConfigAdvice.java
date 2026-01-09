@@ -30,10 +30,12 @@ public class ProducerConfigAdvice {
 	 * Kafka ConsumerConfig 생성 이후 호출
 	 * 
 	 * @param config 생성된 Kafka ProviderConfig 객체
+	 * @param clientId 프로듀서 클라이언트 아이디
 	 */
 	@Advice.OnMethodExit
 	public static void onPostProducerConfigConstructor(
-		@Advice.This Object config
+		@Advice.This Object config,
+		@Advice.FieldValue("clientId") String clientId
 	) {
 
 		try {
@@ -47,7 +49,7 @@ public class ProducerConfigAdvice {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			this.configMap(config.toString(), configValues);
+			configMap(clientId, configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
