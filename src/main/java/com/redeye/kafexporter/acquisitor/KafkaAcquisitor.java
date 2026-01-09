@@ -28,18 +28,39 @@ public class KafkaAcquisitor {
 
 	/** polling 시간 수집 큐 */
 	private static BlockingQueue<IntervalDTO> intervalQueue = new LinkedBlockingQueue<>();
+
+	/** 싱글톤 용 Kafka 수집기 객체 */
+	private static KafkaAcquisitor acquisitor;
 	
 
 	/** Kafka JMX 정보 수집기 */
 	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
-	
+
+
+	/**
+	 * Kafka 수집기 인스턴스 반환 - 싱글톤
+	 */
+	public static KafkaAcquisitor getInstance() {
+
+		if(acquisitor == null) {
+			acquisitor = new KafkaAcquisitor();
+		}
+
+		return acquisitor;
+	}
 	
 	/**
 	 * 생성자
+	 */
+	private KafkaAcquisitor() {
+	}
+
+	/**
+	 * 초기화
 	 *
 	 * @param inst Java 인스트루먼트 객체
 	 */
-	public KafkaAcquisitor(Instrumentation inst) {
+	public void init(Instrumentation inst) {
 
 		// 입력값 검증
 		if(inst == null) {
