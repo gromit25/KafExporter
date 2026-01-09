@@ -13,10 +13,18 @@ import net.bytebuddy.asm.Advice;
  */
 public class ConsumerAdvice {
 
-	private static BlockingQueue<> queue;
+	
+	/** */
+	private static BlockingQueue<IntervalDTO> queue;
+	
 
-	public static void init(BlockingQueue<> queue) {
-		this.queue = queue;
+	/**
+	 * 초기화
+	 *
+	 * @param queue
+	 */
+	public static void init(BlockingQueue<IntervalDTO> queue) {
+		ConsumerAdvice.queue = queue;
 	}
 	
 	/**
@@ -26,7 +34,11 @@ public class ConsumerAdvice {
 	 */
 	@Advice.OnMethodEnter
 	public static void onEnter(@Advice.FieldValue("clientId") String clientId) {
-		long now = System.currentTimeMillis();
-		queue.put(now);
+		
+		if(queue == null) {
+			return;
+		}
+
+		queue.put(new IntervalDTO(clientId, System.currentTimeMillis()));
 	}
 }
