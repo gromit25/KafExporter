@@ -2,9 +2,9 @@ package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
 
-import com.redeye.kafexporter.acquisitor.interceptor.ConsumerConfigInterceptor;
+import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
-import com.redeye.kafexporter.acquisitor.interceptor.ProducerConfigInterceptor;
+import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
 import com.redeye.kafexporter.util.cron.CronJob;
 
@@ -19,15 +19,15 @@ import net.bytebuddy.matcher.ElementMatchers;
  */
 public class KafkaAcquisitor {
 	
-	
-	/** Kafka JMX 정보 수집기 */
-	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
 
 	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
-	private Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
+	private static Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
 
 	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
-	private Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
+	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
+
+	/** Kafka JMX 정보 수집기 */
+	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
 	
 	
 	/**
@@ -61,25 +61,29 @@ public class KafkaAcquisitor {
 	    	.installOn(inst);
 
 		// Kafka ProducerConfig 생성자 호출 어드바이스 설정
+		ProducerConfigAdvice.init(producerConfigMap);
+			
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.producer.ProducerConfig"))
 			.transform(
 				(builder, typeDescription, classLoader, module, protectedDomain) -> {
 					return builder
 						.constructor(ElementMatchers.any())
-						.intercept(MethodDelegation.to(new ProducerConfigInterceptor(this.producerConfigMap)));
+						.intercept(Advice.to(ProducerConfigAdvice.class));
 				}
 			)
         	.installOn(inst);
 		
 		// Kafka ConsumerConfig 생성자 호출 어드바이스 설정
+		ConsumerConfigAdvice.init(consumerConfigMap);
+		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.ConsumerConfig"))
 			.transform(
 				(builder, typeDescription, classLoader, module, protectedDomain) -> {
 					return builder
 						.constructor(ElementMatchers.any())
-						.intercept(MethodDelegation.to(new ConsumerConfigInterceptor(this.consumerConfigMap)));
+						.intercept(Advice.to(ConsumerConfigInterceptor.class));
 				}
 			)
         	.installOn(inst);
