@@ -29,7 +29,7 @@ public class ProducerConfigAdvice {
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
 	 * 
-	 * @param config 생성된 Kafka ProviderConfig 객체
+	 * @param config 생성된 Kafka ProducerConfig 객체
 	 */
 	@Advice.OnMethodExit
 	public static void onPostProducerConfigConstructor(
