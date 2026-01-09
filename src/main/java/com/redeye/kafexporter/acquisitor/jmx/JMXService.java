@@ -113,11 +113,11 @@ public class JMXService implements Closeable {
 			if(this.jmxConnector != null) {
 				return this.jmxConnector.getMBeanServerConnection();
 			} else {
-				throw new Exception("jmxConnector is null.");
+				throw new Exception("'jmxConnector' is null.");
 			}
 			
 		} else {
-			throw new Exception("connType is invalid.");
+			throw new Exception("'connType' is invalid.");
 		}
 	}
 
@@ -131,7 +131,7 @@ public class JMXService implements Closeable {
 		
 		// 입력 값 검증
 		if(StringUtil.isBlank(namePatternStr) == true) {
-			throw new Exception("pattern is null or blank.");
+			throw new Exception("'pattern' is null or blank.");
 		}
 		
 		// 검색 수행
@@ -158,11 +158,11 @@ public class JMXService implements Closeable {
 
 		// 입력 값 검증
 		if(StringUtil.isBlank(objectNameStr) == true) {
-			throw new IllegalArgumentException("objectNameStr is null or blank.");
+			throw new IllegalArgumentException("'objectNameStr' is null or blank.");
 		}
 		
 		if(StringUtil.isBlank(attrNameStr) == true) {
-			throw new IllegalArgumentException("attrNameStr is null or blank.");
+			throw new IllegalArgumentException("'attrNameStr' is null or blank.");
 		}
 
 		// ObjectName 설정
@@ -185,7 +185,7 @@ public class JMXService implements Closeable {
 
 		// 입력 값 검증
 		if(returnType == null) {
-			throw new IllegalArgumentException("returnType is null.");
+			throw new IllegalArgumentException("'returnType' is null.");
 		}
 
 		// JMX 값 획득 및 반환
@@ -204,11 +204,11 @@ public class JMXService implements Closeable {
 		
 		// 입력 값 검증
 		if(StringUtil.isBlank(query) == true) {
-			throw new IllegalArgumentException("query is null or blank.");
+			throw new IllegalArgumentException("'query' is null or blank.");
 		}
 		
 		if(attrNameAry == null || attrNameAry.length == 0) {
-			throw new IllegalArgumentException("attrNameAry is null or length is 0.");
+			throw new IllegalArgumentException("'attrNameAry' is null or length is 0.");
 		}
 		
 		// ObjectName 맵 변수
