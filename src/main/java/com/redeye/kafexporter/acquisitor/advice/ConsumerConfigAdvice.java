@@ -11,6 +11,11 @@ import net.bytebuddy.asm.Advice;
  * @author jmsohn
  */
 public class ConsumerConfigAdvice {
+
+	
+	/** */
+	private static Map<String, Map<String, Object>> configMap = new ConcurrentHashMap<>();
+	
 	
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
@@ -24,12 +29,15 @@ public class ConsumerConfigAdvice {
 
 		try {
 
-			Method values = config.getClass().getMethod("values");
+			Method valuesMethod = config.getClass().getMethod("values");
+			if(valuesMethod == null) {
+				return null;
+			}
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> configMap = (Map<String, Object>)values.invoke(config);
+			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			System.out.println(configMap);
+			this.configMap(config.toString(), configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
