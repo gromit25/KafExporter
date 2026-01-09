@@ -11,7 +11,7 @@ import net.bytebuddy.asm.Advice;
  * 
  * @author jmsohn
  */
-public class ConsumerAdvice {
+public class KafkaConsumerAdvice {
 
 	
 	/** */
