@@ -10,7 +10,7 @@ import net.bytebuddy.asm.Advice;
  * 
  * @author jmsohn
  */
-public class ConsumerConfigInterceptor {
+public class ConsumerConfigAdvice {
 
 	
 	/** */
@@ -18,12 +18,12 @@ public class ConsumerConfigInterceptor {
 
 	
 	/**
-	 * 생성자
+	 * 초기화
 	 *
 	 * @param configMap
 	 */
-	public ConsumerConfigInterceptor(Map<String, Map<String, Object>> configMap) {
-		this.configMap = configMap;
+	public static void init(Map<String, Map<String, Object>> configMap) {
+		ConsumerConfigAdvice.configMap = configMap;
 	}
 	
 	/**
@@ -46,7 +46,8 @@ public class ConsumerConfigInterceptor {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			this.configMap.put(config.toString(), configValues);
+			//TODO client id 로 변경해야 함
+			ConsumerConfigAdvice.configMap.put(config.toString(), configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
