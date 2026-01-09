@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KafkaJMXAcquisitor {
 	
+	
 	/** Kafka JMX 데이터 수집 객체 */
 	private JMXService svc;
 	
