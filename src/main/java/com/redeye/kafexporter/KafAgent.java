@@ -9,7 +9,7 @@ import com.redeye.kafexporter.acquisitor.AcquireJob;
  * 
  * @author jmsohn
  */
-public class Agent {
+public class KafAgent {
 	
 	/**
 	 * Java VM의 Kafka JMX 데이터를 읽어오는 스레드 실행
