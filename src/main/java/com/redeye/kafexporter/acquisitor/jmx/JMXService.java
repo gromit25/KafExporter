@@ -25,6 +25,7 @@ import lombok.Getter;
  * @author jmsohn
  */
 public class JMXService implements Closeable {
+
 	
 	/**
 	 * JMX 연결 타입 enum
@@ -33,6 +34,7 @@ public class JMXService implements Closeable {
 		INTERNAL,
 		EXTERNAL
 	}
+	
 	
 	/** JMX 연결 타입 */
 	private JMXConnectionType connType;
