@@ -10,12 +10,21 @@ import net.bytebuddy.asm.Advice;
  * 
  * @author jmsohn
  */
-public class ConsumerConfigAdvice {
+public class ConsumerConfigInterceptor {
 
 	
 	/** */
-	private static Map<String, Map<String, Object>> configMap = new ConcurrentHashMap<>();
+	private static Map<String, Map<String, Object>> configMap;
+
 	
+	/**
+	 * 생성자
+	 *
+	 * @param configMap
+	 */
+	public ConsumerConfigInterceptor(Map<String, Map<String, Object>> configMap) {
+		this.configMap = configMap;
+	}
 	
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
@@ -37,7 +46,7 @@ public class ConsumerConfigAdvice {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			this.configMap(config.toString(), configValues);
+			this.configMap.put(config.toString(), configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
