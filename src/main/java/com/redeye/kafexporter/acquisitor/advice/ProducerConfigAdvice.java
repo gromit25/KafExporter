@@ -11,11 +11,16 @@ import net.bytebuddy.asm.Advice;
  * @author jmsohn
  */
 public class ProducerConfigAdvice {
+
+	
+	/** */
+	private static Map<String, Map<String, Object>> configMap = new ConcurrentHashMap<>();
+	
 	
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
 	 * 
-	 * @param consumer
+	 * @param config
 	 */
 	@Advice.OnMethodExit
 	public static void onPostProducerConfigConstructor(
@@ -24,12 +29,16 @@ public class ProducerConfigAdvice {
 
 		try {
 
+			//
 			Method values = config.getClass().getMethod("values");
+			if(values == null) {
+				return null;
+			}
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> configMap = (Map<String, Object>)values.invoke(config);
+			Map<String, Object> configValues = (Map<String, Object>)values.invoke(config);
 
-			System.out.println(configMap);
+			this.configMap(config.toString(), configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
