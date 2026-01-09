@@ -2,8 +2,8 @@ package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
 
+import com.redeye.kafexporter.acquisitor.advice.ConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
 import com.redeye.kafexporter.util.cron.CronJob;
@@ -27,7 +27,7 @@ public class KafkaAcquisitor {
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static BlockingQueue<String> queue = new LinkedBlockingQueue<>();
+	private static BlockingQueue<String> intervalQueue = new LinkedBlockingQueue<>();
 	
 
 	/** Kafka JMX 정보 수집기 */
@@ -53,7 +53,7 @@ public class KafkaAcquisitor {
 	private void addTransformer(Instrumentation inst) {
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
-		KafkaConsumerAdvice.init(queue);
+		ConsumerAdvice.init(intervalQueue);
 		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
