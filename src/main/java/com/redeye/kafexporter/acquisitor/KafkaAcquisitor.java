@@ -1,12 +1,16 @@
 package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
-import com.redeye.kafexporter.util.cron.CronJob;
+import com.redeye.kafexporter.acquisitor.model.IntervalDTO;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -79,7 +83,7 @@ public class KafkaAcquisitor {
 	private void addTransformer(Instrumentation inst) {
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
-		ConsumerAdvice.init(intervalQueue);
+		KafkaConsumerAdvice.init(intervalQueue);
 		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
@@ -115,7 +119,7 @@ public class KafkaAcquisitor {
 				(builder, typeDescription, classLoader, module, protectedDomain) -> {
 					return builder
 						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(ConsumerConfigInterceptor.class));
+						.intercept(Advice.to(ConsumerConfigAdvice.class));
 				}
 			)
         	.installOn(inst);

@@ -18,7 +18,7 @@ public class KafkaJMXAcquisitor {
 	/**
 	 * Kafka 데이터 수집기 초기화
 	 */
-	public KafkaJMXAcquisitor() throws Exception {
+	public KafkaJMXAcquisitor() {
 		this.svc = new JMXService();
 	}
 
