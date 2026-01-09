@@ -34,20 +34,21 @@ public class ConsumerConfigAdvice {
 	@Advice.OnMethodExit
 	public static void onPostConsumerConfigConstructor(
 		@Advice.This Object config,
+		@Advice.FieldValue("clientId") String clientId
 	) {
 
 		try {
 
 			Method valuesMethod = config.getClass().getMethod("values");
 			if(valuesMethod == null) {
-				return null;
+				return;
 			}
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
 			//TODO client id 로 변경해야 함
-			ConsumerConfigAdvice.configMap.put(config.toString(), configValues);
+			configMap.put(clientId, configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
