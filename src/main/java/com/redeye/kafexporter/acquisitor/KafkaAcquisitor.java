@@ -26,6 +26,10 @@ public class KafkaAcquisitor {
 	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
+	/** polling 시간 수집 큐 */
+	private static BlockingQueue<String> queue = new LinkedBlockingQueue<>();
+	
+
 	/** Kafka JMX 정보 수집기 */
 	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
 	
@@ -49,6 +53,8 @@ public class KafkaAcquisitor {
 	private void addTransformer(Instrumentation inst) {
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
+		KafkaConsumerAdvice.init(queue);
+		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
 			.transform(
