@@ -6,8 +6,10 @@ package com.redeye.kafexporter.util;
  * @author jmsohn
  */
 public enum OrderType {
+	
 	/** 오름 차순(1,2,3,...) */
 	ASCEND,
+	
 	/** 내림 차순(10,9,8,...) */
 	DESCEND
 }
