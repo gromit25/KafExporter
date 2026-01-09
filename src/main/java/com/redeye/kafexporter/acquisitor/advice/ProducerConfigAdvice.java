@@ -20,7 +20,7 @@ public class ProducerConfigAdvice {
 	/**
 	 * Kafka ConsumerConfig 생성 이후 호출
 	 * 
-	 * @param config
+	 * @param config 생성된 Kafka ProviderConfig 객체
 	 */
 	@Advice.OnMethodExit
 	public static void onPostProducerConfigConstructor(
@@ -30,13 +30,13 @@ public class ProducerConfigAdvice {
 		try {
 
 			//
-			Method values = config.getClass().getMethod("values");
-			if(values == null) {
+			Method valuesMethod = config.getClass().getMethod("values");
+			if(valuesMethod == null) {
 				return null;
 			}
 
 			@SuppressWarnings("unchecked")
-			Map<String, Object> configValues = (Map<String, Object>)values.invoke(config);
+			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
 			this.configMap(config.toString(), configValues);
 
