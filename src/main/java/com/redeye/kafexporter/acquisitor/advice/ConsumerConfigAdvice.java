@@ -33,8 +33,7 @@ public class ConsumerConfigAdvice {
 	 */
 	@Advice.OnMethodExit
 	public static void onPostConsumerConfigConstructor(
-		@Advice.This Object config,
-		@Advice.FieldValue("clientId") String clientId
+		@Advice.This Object config
 	) {
 
 		try {
