@@ -27,7 +27,7 @@ public class KafkaJMXAcquisitor {
 	 * 
 	 * @return Kafka JMX 성능 정보
 	 */
-	public Map<String, Map<String, Object>> acquireMetrics() throws Exception {
+	public Map<String, Map<String, Object>> acquire() throws Exception {
 		
 		// JMX 메시지 수집
 		Map<String, Map<String, Object>> nameAttrMap = new ConcurrentHashMap<>();
