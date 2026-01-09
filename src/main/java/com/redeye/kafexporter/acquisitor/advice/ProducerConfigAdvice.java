@@ -14,11 +14,11 @@ public class ProducerConfigAdvice {
 
 	
 	/** */
-	private static Map<String, Map<String, Object>> configMap = new ConcurrentHashMap<>();
+	private static Map<String, Map<String, Object>> configMap;
 
 
 	/**
-	 *
+	 * 초기화
 	 *
 	 * @param configMap
 	 */
