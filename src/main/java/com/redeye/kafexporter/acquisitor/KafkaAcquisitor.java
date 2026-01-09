@@ -39,7 +39,12 @@ public class KafkaAcquisitor {
 	 *
 	 * @param inst Java 인스트루먼트 객체
 	 */
-	public KafkaAcquisitor(Instrumentation inst) throws Exception {
+	public KafkaAcquisitor(Instrumentation inst) {
+
+		// 입력값 검증
+		if(inst == null) {
+			throw new IllegalArgumentException("'inst' is null.");
+		}
 		
 		// 메소드 훅킹 인터셉터 등록
 		this.addTransformer(inst);
