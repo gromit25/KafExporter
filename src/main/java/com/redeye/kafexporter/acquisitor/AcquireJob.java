@@ -17,7 +17,7 @@ import net.bytebuddy.matcher.ElementMatchers;
  * 
  * @author jmsohn
  */
-public class AcquireJob {
+public class KafkaAcquisitor {
 	
 	/** */
 	private static KafkaJMXAcquisitor jmxAcquisitor;
@@ -69,7 +69,6 @@ public class AcquireJob {
 				}
 			)
 	    	.installOn(inst);
-
 		
 		// Kafka ConsumerConfig 생성자 호출 어드바이스 설정
 		new AgentBuilder.Default()
