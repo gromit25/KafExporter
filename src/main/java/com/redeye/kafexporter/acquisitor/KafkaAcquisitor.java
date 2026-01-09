@@ -2,9 +2,9 @@ package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
 
-import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.interceptor.ConsumerConfigInterceptor;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
-import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.interceptor.ProducerConfigInterceptor;
 import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
 import com.redeye.kafexporter.util.cron.CronJob;
 
@@ -37,12 +37,12 @@ public class KafkaAcquisitor {
 	 */
 	public KafkaAcquisitor(Instrumentation inst) throws Exception {
 		
-		//
+		// 메소드 훅킹 인터셉터 등록
 		this.addTransformer(inst);
 	}
 	
 	/**
-	 * 
+	 * 메소드 훅킹 인터셉터 등록 - 바이트 코드 변환
 	 * 
 	 * @param inst Java 인스트루먼트 객체
 	 */
@@ -59,6 +59,18 @@ public class KafkaAcquisitor {
 				}
 			)
 	    	.installOn(inst);
+
+		// Kafka ProducerConfig 생성자 호출 어드바이스 설정
+		new AgentBuilder.Default()
+			.type(ElementMatchers.named("org.apache.kafka.clients.producer.ProducerConfig"))
+			.transform(
+				(builder, typeDescription, classLoader, module, protectedDomain) -> {
+					return builder
+						.constructor(ElementMatchers.any())
+						.intercept(MethodDelegation.to(new ProducerConfigInterceptor(this.producerConfigMap)));
+				}
+			)
+        	.installOn(inst);
 		
 		// Kafka ConsumerConfig 생성자 호출 어드바이스 설정
 		new AgentBuilder.Default()
@@ -67,19 +79,7 @@ public class KafkaAcquisitor {
 				(builder, typeDescription, classLoader, module, protectedDomain) -> {
 					return builder
 						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(ConsumerConfigAdvice.class));
-				}
-			)
-        	.installOn(inst);
-		
-		// Kafka ProducerConfig 생성자 호출 어드바이스 설정
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.apache.kafka.clients.producer.ProducerConfig"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectedDomain) -> {
-					return builder
-						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(ProducerConfigAdvice.class));
+						.intercept(MethodDelegation.to(new ConsumerConfigInterceptor(this.consumerConfigMap)));
 				}
 			)
         	.installOn(inst);
