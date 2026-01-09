@@ -13,50 +13,40 @@ import net.bytebuddy.asm.Advice;
 import net.bytebuddy.matcher.ElementMatchers;
 
 /**
- * 
+ * Kafka 정보 수집기
  * 
  * @author jmsohn
  */
 public class KafkaAcquisitor {
 	
-	/** */
-	private static KafkaJMXAcquisitor jmxAcquisitor;
+	
+	/** Kafka JMX 정보 수집기 */
+	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
 
-	/**
-	 * 
-	 * 
-	 * @param period
-	 */
-	public static void start(String period, Instrumentation inst) {
-		
-		try {
-			
-			//
-			init(inst);
-			
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
-	}
+	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
+	private Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
+
+	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
+	private Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
+	
 	
 	/**
-	 * 
+	 * 생성자
+	 *
+	 * @param inst Java 인스트루먼트 객체
 	 */
-	private static void init(Instrumentation inst) throws Exception {
+	public KafkaAcquisitor(Instrumentation inst) throws Exception {
 		
 		//
-		jmxAcquisitor = new KafkaJMXAcquisitor();
-		
-		//
-		addTransformer(inst);
+		this.addTransformer(inst);
 	}
 	
 	/**
 	 * 
 	 * 
-	 * @param inst
+	 * @param inst Java 인스트루먼트 객체
 	 */
-	private static void addTransformer(Instrumentation inst) {
+	private void addTransformer(Instrumentation inst) {
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
 		new AgentBuilder.Default()
@@ -93,20 +83,5 @@ public class KafkaAcquisitor {
 				}
 			)
         	.installOn(inst);
-	}
-	
-	/**
-	 * 
-	 */
-	private static void acquire() throws Exception {
-		
-		System.out.println("  ******* Kafka JMX Metrics *******  ");
-		System.out.println(jmxAcquisitor.acquireMetrics());
-//		
-//		System.out.println("  ******* DEBUG 202 *******  ");
-//		System.out.println(KafkaConsumerAdvice.pollingTimeParameter);
-//		System.out.println("K:" + KafkaConsumerAdvice.pollingTimeParameter.getKurtosis());
-		
-		//KafkaConsumerAdvice.reset();
 	}
 }
