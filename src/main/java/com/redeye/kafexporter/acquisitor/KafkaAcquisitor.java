@@ -2,8 +2,8 @@ package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
 
-import com.redeye.kafexporter.acquisitor.advice.ConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
 import com.redeye.kafexporter.util.cron.CronJob;
