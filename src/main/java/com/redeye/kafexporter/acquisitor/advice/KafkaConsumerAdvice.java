@@ -2,10 +2,7 @@ package com.redeye.kafexporter.acquisitor.advice;
 
 import java.util.concurrent.BlockingQueue;
 
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-
 import com.redeye.kafexporter.acquisitor.model.IntervalDTO;
-import com.redeye.kafexporter.util.stat.Parameter;
 
 import net.bytebuddy.asm.Advice;
 
@@ -42,6 +39,10 @@ public class KafkaConsumerAdvice {
 			return;
 		}
 
-		queue.put(new IntervalDTO(clientId, System.currentTimeMillis()));
+		try {
+			queue.put(new IntervalDTO(clientId, System.currentTimeMillis()));
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

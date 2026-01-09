@@ -23,7 +23,7 @@ public class ProducerConfigAdvice {
 	 * @param configMap
 	 */
 	public static void init(Map<String, Map<String, Object>> configMap) {
-		this.configMap = configMap;
+		ProducerConfigAdvice.configMap = configMap;
 	}
 	
 	/**
@@ -41,13 +41,13 @@ public class ProducerConfigAdvice {
 			//
 			Method valuesMethod = config.getClass().getMethod("values");
 			if(valuesMethod == null) {
-				return null;
+				return;
 			}
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			configMap(clientId, configValues);
+			configMap.put(clientId, configValues);
 
 		} catch (Exception e) {
 			e.printStackTrace();
