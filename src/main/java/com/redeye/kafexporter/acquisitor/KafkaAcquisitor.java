@@ -27,7 +27,7 @@ public class KafkaAcquisitor {
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static BlockingQueue<String> intervalQueue = new LinkedBlockingQueue<>();
+	private static BlockingQueue<IntervalDTO> intervalQueue = new LinkedBlockingQueue<>();
 	
 
 	/** Kafka JMX 정보 수집기 */
