@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.util.daemon;
+package com.redeye.kafexporter.util.deamon;
 
 /**
  * 데몬 프로그램을 위한 추상 클래스

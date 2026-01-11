@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.util.daemon;
+package com.redeye.kafexporter.util.deamon;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
