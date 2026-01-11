@@ -3,6 +3,8 @@ package com.redeye.kafexporter.acquisitor.advice;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.redeye.kafexporter.acquisitor.Constants;
+
 import net.bytebuddy.asm.Advice;
 
 /**
@@ -13,7 +15,7 @@ import net.bytebuddy.asm.Advice;
 public class ProducerConfigAdvice {
 
 	
-	/** */
+	/** 프로듀스 설정 맵 */
 	private static Map<String, Map<String, Object>> configMap;
 
 
@@ -47,7 +49,12 @@ public class ProducerConfigAdvice {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			configMap.put(clientId, configValues);
+			if(configValues != null && configValues.containsKey(Constants.CLIENT_ID) == true) {
+				configMap.put(
+					configValues.get(Constants.CLIENT_ID).toString(),
+					configValues
+				);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

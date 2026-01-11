@@ -6,11 +6,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.redeye.StringUtil;
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.jmx.KafkaJMXAcquisitor;
+import com.redeye.kafexporter.acquisitor.jmx.JMXService;
 import com.redeye.kafexporter.acquisitor.model.IntervalDTO;
+import com.redeye.kafexporter.util.daemon.QueueDaemon;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -24,6 +26,9 @@ import net.bytebuddy.matcher.ElementMatchers;
 public class KafkaAcquisitor {
 	
 
+	/** 싱글톤 용 Kafka 수집기 객체 */
+	private static KafkaAcquisitor acquisitor;
+
 	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
 	private static Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
 
@@ -33,12 +38,12 @@ public class KafkaAcquisitor {
 	/** polling 시간 수집 큐 */
 	private static BlockingQueue<IntervalDTO> intervalQueue = new LinkedBlockingQueue<>();
 
-	/** 싱글톤 용 Kafka 수집기 객체 */
-	private static KafkaAcquisitor acquisitor;
 	
-
-	/** Kafka JMX 정보 수집기 */
-	private KafkaJMXAcquisitor jmxAcquisitor  = new KafkaJMXAcquisitor();
+	/** */
+	private QueueDaemon<IntervalDTO> intervalConsumerDaemon;
+	
+	/** Kafka JMX 데이터 수집 객체 */
+	private JMXService jmxSvc = new JMXService();
 
 
 	/**
@@ -64,7 +69,7 @@ public class KafkaAcquisitor {
 	 *
 	 * @param inst Java 인스트루먼트 객체
 	 */
-	public void init(Instrumentation inst) {
+	public KafkaAcquisitor init(Instrumentation inst) {
 
 		// 입력값 검증
 		if(inst == null) {
@@ -73,6 +78,18 @@ public class KafkaAcquisitor {
 		
 		// 메소드 훅킹 인터셉터 등록
 		this.addTransformer(inst);
+		
+		//
+		this.intervalConsumerDaemon = new QueueDaemon<>(
+			intervalQueue,
+			(data) -> {
+				System.out.println("DEBUG 100: " + data);
+			}
+		);
+		
+		this.intervalConsumerDaemon.run();
+		
+		return this;
 	}
 	
 	/**
@@ -123,5 +140,20 @@ public class KafkaAcquisitor {
 				}
 			)
         	.installOn(inst);
+	}
+	
+	/**
+	 * JMX 성능 정보 반환
+	 * 
+	 * @param query JMX 쿼리
+	 * @return 성능 정보 반환
+	 */
+	public Map<String, Map<String, Object>> getJMXMetrics(String query) throws Exception {
+		
+		if(StringUtil.isBlank(query) == true) {
+			throw new IllegalArgumentException("'query' is null.");
+		}
+		
+		return this.jmxSvc.getByQuery(query);
 	}
 }

@@ -3,6 +3,8 @@ package com.redeye.kafexporter.acquisitor.advice;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.redeye.kafexporter.acquisitor.Constants;
+
 import net.bytebuddy.asm.Advice;
 
 /**
@@ -13,7 +15,7 @@ import net.bytebuddy.asm.Advice;
 public class ConsumerConfigAdvice {
 
 	
-	/** */
+	/** 컨슈머 설정 맵 */
 	private static Map<String, Map<String, Object>> configMap;
 
 	
@@ -46,8 +48,12 @@ public class ConsumerConfigAdvice {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> configValues = (Map<String, Object>)valuesMethod.invoke(config);
 
-			//TODO client id 로 변경해야 함
-			configMap.put(clientId, configValues);
+			if(configValues != null && configValues.containsKey(Constants.CLIENT_ID) == true) {
+				configMap.put(
+					configValues.get(Constants.CLIENT_ID).toString(),
+					configValues
+				);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

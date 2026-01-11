@@ -2,7 +2,7 @@ package com.redeye.kafexporter;
 
 import java.lang.instrument.Instrumentation;
 
-import com.redeye.kafexporter.acquisitor.AcquireJob;
+import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
 
 /**
  * Kafka 수집 에이전트 메인 클래스
@@ -19,14 +19,7 @@ public class KafAgent {
 	 */
 	public static void premain(String args, Instrumentation inst) {
 		
-		// 수집 주기 설정
-		String portNumStr = System.getenv("KAF_EXPORTER_PORT");
-		if(portNumStr == null) {
-			// 환경변수가 없는 경우 디폴트 값 설정
-			portNumStr = "1234";
-		}
-		
 		// 수집기 기동
-		AcquireJob.start(period, inst);
+		KafkaAcquisitor.getInstance().init(inst);
 	}
 }
