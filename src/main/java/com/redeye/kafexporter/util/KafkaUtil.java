@@ -5,9 +5,17 @@ import java.util.List;
 
 import com.redeye.kafexporter.acquisitor.jmx.JMXService;
 
+/**
+ * 
+ * 
+ * @author jmsohn
+ */
 public class KafkaUtil {
 	
+	
+	/** */
 	private static final String CLIENT_ID_QUERY = "kafka.producer:client-id=*,type=producer-metrics";
+	
 	
 	/**
 	 * 
