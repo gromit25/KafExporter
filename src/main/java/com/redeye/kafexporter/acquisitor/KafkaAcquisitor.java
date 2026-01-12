@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.redeye.StringUtil;
+import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
