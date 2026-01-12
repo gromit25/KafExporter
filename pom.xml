@@ -1,4 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>KafExporter</groupId>
 	<artifactId>KafExporter</artifactId>
@@ -9,12 +10,6 @@
 	</properties>
 	
 	<dependencies>
-		
-		<dependency>
-			<groupId>com.redeye</groupId>
-			<artifactId>TextGen</artifactId>
-			<version>0.1</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>net.bytebuddy</groupId>
@@ -29,13 +24,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka-clients</artifactId>
-			<version>3.8.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.24</version>
@@ -45,7 +33,7 @@
 	</dependencies>
   
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			
 			<plugin>
@@ -94,7 +82,7 @@
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
 						<manifestEntries>
-							<Premain-Class>com.epozen.emma.kafkaexporter.Agent</Premain-Class>
+							<Premain-Class>com.epozen.emma.kafkaexporter.KafExporter</Premain-Class>
 							<Can-Redefine-Classes>true</Can-Redefine-Classes>
 							<Can-Retransform-Classes>true</Can-Retransform-Classes>
 						</manifestEntries>
