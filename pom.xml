@@ -82,7 +82,7 @@
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
 						<manifestEntries>
-							<Premain-Class>com.epozen.emma.kafkaexporter.KafExporter</Premain-Class>
+							<Premain-Class>com.redeye.kafexporter.KafExporter</Premain-Class>
 							<Can-Redefine-Classes>true</Can-Redefine-Classes>
 							<Can-Retransform-Classes>true</Can-Retransform-Classes>
 						</manifestEntries>
