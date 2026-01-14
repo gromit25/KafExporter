@@ -6,7 +6,7 @@
 	<version>0.1</version>
 	
 	<properties>
-		<deploy.target.dir>C:/apps/KafkaExporter</deploy.target.dir>
+		<deploy.target.dir>C:/apps/KafExporter</deploy.target.dir>
 	</properties>
 	
 	<dependencies>
