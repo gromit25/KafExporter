@@ -12,7 +12,7 @@ import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerConstructorAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.JMXService;
-import com.redeye.kafexporter.acquisitor.model.IntervalDTO;
+import com.redeye.kafexporter.acquisitor.model.TimeDTO;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -37,11 +37,11 @@ public class KafkaAcquisitor {
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static BlockingQueue<IntervalDTO> intervalQueue = new LinkedBlockingQueue<>();
+	private static BlockingQueue<TimeDTO> intervalQueue = new LinkedBlockingQueue<>();
 
 	
 	/** */
-	private QueueDaemon<IntervalDTO> intervalConsumerDaemon;
+	private QueueDaemon<TimeDTO> intervalConsumerDaemon;
 	
 	/** Kafka JMX 데이터 수집 객체 */
 	private JMXService jmxSvc = new JMXService();

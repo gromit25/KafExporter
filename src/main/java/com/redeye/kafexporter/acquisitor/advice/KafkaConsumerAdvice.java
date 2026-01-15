@@ -2,7 +2,7 @@ package com.redeye.kafexporter.acquisitor.advice;
 
 import java.util.concurrent.BlockingQueue;
 
-import com.redeye.kafexporter.acquisitor.model.IntervalDTO;
+import com.redeye.kafexporter.acquisitor.model.TimeDTO;
 
 import net.bytebuddy.asm.Advice;
 
@@ -15,7 +15,7 @@ public class KafkaConsumerAdvice {
 
 	
 	/** */
-	public static BlockingQueue<IntervalDTO> queue;
+	public static BlockingQueue<TimeDTO> queue;
 	
 	
 	/**
@@ -23,7 +23,7 @@ public class KafkaConsumerAdvice {
 	 *
 	 * @param queue
 	 */
-	public static void init(BlockingQueue<IntervalDTO> queue) {
+	public static void init(BlockingQueue<TimeDTO> queue) {
 		KafkaConsumerAdvice.queue = queue;
 	}
 	
@@ -49,7 +49,7 @@ public class KafkaConsumerAdvice {
 		try {
 			
 			System.out.println("#### PUT INTERVAL: " + clientId);
-			queue.put(new IntervalDTO(clientId, System.currentTimeMillis()));
+			queue.put(new TimeDTO(clientId, System.currentTimeMillis()));
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
