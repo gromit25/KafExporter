@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerAdvice;
+import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerPollAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerConstructorAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.JMXService;
@@ -159,7 +159,7 @@ public class KafkaAcquisitor {
 			.installOn(inst);
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
-		KafkaConsumerAdvice.init(pollTimeQueue);
+		KafkaConsumerPollAdvice.init(pollTimeQueue);
 		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
@@ -167,7 +167,7 @@ public class KafkaAcquisitor {
 				(builder, typeDescription, classLoader, module, protectedDomain) -> {
 					return builder.visit(
 						Advice
-							.to(KafkaConsumerAdvice.class)
+							.to(KafkaConsumerPollAdvice.class)
 							.on(ElementMatchers.named("poll")
 							.and(ElementMatchers.takesArguments(1)))
 					);

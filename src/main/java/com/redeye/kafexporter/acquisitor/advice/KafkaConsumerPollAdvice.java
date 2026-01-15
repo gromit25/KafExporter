@@ -11,7 +11,7 @@ import net.bytebuddy.asm.Advice;
  * 
  * @author jmsohn
  */
-public class KafkaConsumerAdvice {
+public class KafkaConsumerPollAdvice {
 
 	
 	/** */
@@ -24,7 +24,7 @@ public class KafkaConsumerAdvice {
 	 * @param queue
 	 */
 	public static void init(BlockingQueue<TimeDTO> queue) {
-		KafkaConsumerAdvice.queue = queue;
+		KafkaConsumerPollAdvice.queue = queue;
 	}
 	
 	/**
