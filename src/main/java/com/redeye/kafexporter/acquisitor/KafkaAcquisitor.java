@@ -37,11 +37,11 @@ public class KafkaAcquisitor {
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static BlockingQueue<TimeDTO> intervalQueue = new LinkedBlockingQueue<>();
+	private static BlockingQueue<TimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
 
 	
 	/** */
-	private QueueDaemon<TimeDTO> intervalConsumerDaemon;
+	private QueueDaemon<TimeDTO> pollTimeDaemon;
 	
 	/** Kafka JMX 데이터 수집 객체 */
 	private JMXService jmxSvc = new JMXService();
@@ -81,14 +81,14 @@ public class KafkaAcquisitor {
 		this.addKafkaTransformer(inst);
 		
 		//
-		this.intervalConsumerDaemon = new QueueDaemon<>(
-			intervalQueue,
+		this.pollTimeDaemon = new QueueDaemon<>(
+			pollTimeQueue,
 			(data) -> {
 				System.out.println("DEBUG 100: " + data);
 			}
 		);
 		
-		this.intervalConsumerDaemon.run();
+		this.pollTimeDaemon.run();
 		
 		return this;
 	}
@@ -159,7 +159,7 @@ public class KafkaAcquisitor {
 			.installOn(inst);
 		
 		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
-		KafkaConsumerAdvice.init(intervalQueue);
+		KafkaConsumerAdvice.init(pollTimeQueue);
 		
 		new AgentBuilder.Default()
 			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
