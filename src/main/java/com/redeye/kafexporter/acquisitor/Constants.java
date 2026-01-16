@@ -12,4 +12,7 @@ public class Constants {
 	
 	/** 디폴트 클라이언트 아이디 값 */
 	public static String DEFAULT_CLIENT_ID = "N/A";
+	
+	/** 컨슈머 그룹 아이디 설정 키 값 */
+	public static String CONSUMER_GROUP_ID = "group.id";
 }
