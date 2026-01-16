@@ -20,7 +20,7 @@ public class KafExporter {
 	 */
 	public static void premain(String args, Instrumentation inst) {
 		
-		KafkaAcquisitor.getInstance().init(inst);
+		KafkaAcquisitor.init(inst);
 		
 		try {
 			
