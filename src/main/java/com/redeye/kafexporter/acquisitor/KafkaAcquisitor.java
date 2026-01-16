@@ -14,6 +14,7 @@ import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.jmx.JMXService;
 import com.redeye.kafexporter.acquisitor.model.TimeDTO;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
+import com.redeye.kafexporter.util.stat.Parameter;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -27,53 +28,35 @@ import net.bytebuddy.matcher.ElementMatchers;
 public class KafkaAcquisitor {
 	
 
-	/** 싱글톤 용 Kafka 수집기 객체 */
-	private static KafkaAcquisitor acquisitor;
-
 	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
-	private static Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
+	private static final Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
 
 	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
-	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
+	private static final Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static BlockingQueue<TimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
+	private static final BlockingQueue<TimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
 
+	/** */
+	private static QueueDaemon<TimeDTO> pollTimeDaemon = null;
 	
 	/** */
-	private QueueDaemon<TimeDTO> pollTimeDaemon;
+	private static final Map<String, Parameter> pollTimeStatMap = new ConcurrentHashMap<>();
 	
 	/** (key: 클라이언트 아이디, value: 마지막 poll 호출 시간) */
-	private final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
+	private static final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
+	
 	
 	/** Kafka JMX 데이터 수집 객체 */
-	private JMXService jmxSvc = new JMXService();
+	private static JMXService jmxSvc = new JMXService();
 
-
-	/**
-	 * Kafka 수집기 인스턴스 반환 - 싱글톤
-	 */
-	public static KafkaAcquisitor getInstance() {
-
-		if(acquisitor == null) {
-			acquisitor = new KafkaAcquisitor();
-		}
-
-		return acquisitor;
-	}
-	
-	/**
-	 * 생성자
-	 */
-	private KafkaAcquisitor() {
-	}
 
 	/**
 	 * 초기화
 	 *
 	 * @param inst Java 인스트루먼트 객체
 	 */
-	public KafkaAcquisitor init(Instrumentation inst) {
+	public static void init(Instrumentation inst) {
 
 		// 입력값 검증
 		if(inst == null) {
@@ -81,20 +64,34 @@ public class KafkaAcquisitor {
 		}
 		
 		// Kafka 메소드 인터셉터 등록
-		this.addKafkaTransformer(inst);
+		addKafkaTransformer(inst);
 		
 		//
-		this.pollTimeDaemon = new QueueDaemon<>(
+		pollTimeDaemon = new QueueDaemon<>(
 			pollTimeQueue,
 			(data) -> {
-				// 데이터 저장
+				
+				// 기존 값 저장 
+				Long prePollTime = pollTimeMap.get(data.getClientId());
+				
+				// 폴링 시간 저장
 				pollTimeMap.put(data.getClientId(), data.getTime());
+				
+				// 통계 정보 저장
+				Parameter pollTimeStat = pollTimeStatMap.computeIfAbsent(
+					data.getClientId(), key -> new Parameter()
+				);
+				
+				if(prePollTime != null) {
+					long interval = data.getTime() - prePollTime;
+					pollTimeStat.add(interval);
+				}
+				
+				System.out.println("### STAT : \n" + pollTimeStat);
 			}
 		);
 		
-		this.pollTimeDaemon.run();
-		
-		return this;
+		pollTimeDaemon.run();
 	}
 	
 	/**
@@ -102,7 +99,7 @@ public class KafkaAcquisitor {
 	 * 
 	 * @param inst Java 인스트루먼트 객체
 	 */
-	private void addKafkaTransformer(Instrumentation inst) {
+	private static void addKafkaTransformer(Instrumentation inst) {
 		
 		// --- Kafka ProducerConfig 메소드 훅킹 설정
 		
@@ -184,7 +181,7 @@ public class KafkaAcquisitor {
 			throw new IllegalArgumentException("'query' is null.");
 		}
 		
-		return this.jmxSvc.getByQuery(query);
+		return jmxSvc.getByQuery(query);
 	}
 	
 	/**
