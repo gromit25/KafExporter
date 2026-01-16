@@ -8,7 +8,7 @@ import com.redeye.kafexporter.acquisitor.Constants;
 import net.bytebuddy.asm.Advice;
 
 /**
- * ProducerConfig 어드바이스 클래스
+ * ProducerConfig 생성자 어드바이스 클래스
  * 
  * @author jmsohn
  */
