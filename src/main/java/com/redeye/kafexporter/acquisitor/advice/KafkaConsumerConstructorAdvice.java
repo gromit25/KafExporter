@@ -3,10 +3,12 @@ package com.redeye.kafexporter.acquisitor.advice;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.redeye.kafexporter.acquisitor.Constants;
+
 import net.bytebuddy.asm.Advice;
 
 /**
- * 
+ * Kafka 컨슈머 생성자 어드바이스 클래스
  * 
  * @author jmsohn
  */
@@ -30,8 +32,9 @@ public class KafkaConsumerConstructorAdvice {
 			return;
 		}
 		
+		// 클라이
 		String clientId = ConsumerConfigAdvice.getClientId();
-		if(clientId == null) {
+		if(clientId == null || clientId.equals(Constants.DEFAULT_CLIENT_ID) == true) {
 			return;
 		}
 
@@ -44,7 +47,7 @@ public class KafkaConsumerConstructorAdvice {
 	 * 컨슈머 객체에 해당하는 클라이언트 아이디 반환
 	 * 
 	 * @param consumer 컨슈머 객체
-	 * @return 클라이언트 아이디 반환
+	 * @return 클라이언트 아이디
 	 */
 	public static String getClientId(Object consumer) {
 		
