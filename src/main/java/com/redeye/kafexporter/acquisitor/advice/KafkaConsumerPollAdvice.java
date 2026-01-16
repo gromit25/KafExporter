@@ -32,8 +32,8 @@ public class KafkaConsumerPollAdvice {
 	 *
 	 * @param consumer 컨슈머 객체
 	 */
-	@Advice.OnMethodEnter
-	public static void onEnter(@Advice.This Object consumer) {
+	@Advice.OnMethodExit
+	public static void onExit(@Advice.This Object consumer) {
 		
 		System.out.println("#### POLL ON ENTER #2: ");
 
