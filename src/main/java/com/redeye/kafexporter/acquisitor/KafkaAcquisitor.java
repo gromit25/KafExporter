@@ -30,10 +30,10 @@ public class KafkaAcquisitor {
 	/** 싱글톤 용 Kafka 수집기 객체 */
 	private static KafkaAcquisitor acquisitor;
 
-	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
+	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
 	private static Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
 
-	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, Value: 설정 값 맵) */
+	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
 	private static Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
@@ -42,6 +42,9 @@ public class KafkaAcquisitor {
 	
 	/** */
 	private QueueDaemon<TimeDTO> pollTimeDaemon;
+	
+	/** (key: 클라이언트 아이디, value: 마지막 poll 호출 시간) */
+	private final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
 	
 	/** Kafka JMX 데이터 수집 객체 */
 	private JMXService jmxSvc = new JMXService();
@@ -84,7 +87,8 @@ public class KafkaAcquisitor {
 		this.pollTimeDaemon = new QueueDaemon<>(
 			pollTimeQueue,
 			(data) -> {
-				System.out.println("DEBUG 100: " + data);
+				// 데이터 저장
+				pollTimeMap.put(data.getClientId(), data.getTime());
 			}
 		);
 		
@@ -133,6 +137,9 @@ public class KafkaAcquisitor {
 			.installOn(inst);
 		
 		// --- KafkaConsumer 메소드 훅킹 설정
+		
+		// 초기화
+		KafkaConsumerPollAdvice.init(pollTimeQueue);
 
 		// KafkaConsumer의 생성자 호출 어드바이스 설정
 		new AgentBuilder.Default()
@@ -141,7 +148,13 @@ public class KafkaAcquisitor {
 				(builder, typeDescription, classLoader, module, protectionDomain) -> { 
 					return builder
 						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(KafkaConsumerConstructorAdvice.class));
+						.intercept(Advice.to(KafkaConsumerConstructorAdvice.class))
+						.visit(
+							Advice
+								.to(KafkaConsumerPollAdvice.class)
+								.on(ElementMatchers.named("poll")
+								.and(ElementMatchers.takesArguments(1)))
+						);
 				}
 			)
 			.installOn(inst);
@@ -157,23 +170,6 @@ public class KafkaAcquisitor {
 				}
 			)
 			.installOn(inst);
-		
-		// KafkaConsumer의 poll 메소드 호출 어드바이스 설정
-		KafkaConsumerPollAdvice.init(pollTimeQueue);
-		
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectedDomain) -> {
-					return builder.visit(
-						Advice
-							.to(KafkaConsumerPollAdvice.class)
-							.on(ElementMatchers.named("poll")
-							.and(ElementMatchers.takesArguments(1)))
-					);
-				}
-			)
-	    	.installOn(inst);
 	}
 	
 	/**
@@ -189,5 +185,48 @@ public class KafkaAcquisitor {
 		}
 		
 		return this.jmxSvc.getByQuery(query);
+	}
+	
+	/**
+	 * 설정 속성 값 반환
+	 * 
+	 * @param clientId 클라이언트 아이디
+	 * @param propName 설정 속성 명
+	 * @return 설정 속성 값
+	 */
+	public static Object getConfigValue(String clientId, String propName) {
+		
+		if(StringUtil.isBlank(clientId) == true || StringUtil.isBlank(propName) == true) {
+			return null;
+		}
+		
+		if(producerConfigMap != null && producerConfigMap.containsKey(clientId) == true) {
+			return producerConfigMap.get(clientId).get(propName);
+		}
+		
+		if(consumerConfigMap != null && consumerConfigMap.containsKey(clientId) == true) {
+			return consumerConfigMap.get(clientId).get(propName);
+		}
+		
+		return null;
+	}
+
+	/**
+	 * 설정 속성 값 문자열 반환<br>
+	 * toString 한 결과
+	 * 
+	 * @param clientId 클라이언트 아이디
+	 * @param propName 설정 속성 명
+	 * @return 설정 속성 값 문자열
+	 */
+	public static String getConfigStr(String clientId, String propName) {
+		
+		Object value = getConfigValue(clientId, propName);
+		
+		if(value == null) {
+			return null;
+		} else {
+			return value.toString();
+		}
 	}
 }
