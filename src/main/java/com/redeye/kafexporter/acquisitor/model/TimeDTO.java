@@ -1,20 +1,21 @@
 package com.redeye.kafexporter.acquisitor.model;
 
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * 시간 DTO 클래스
  * 
  * @author jmsohn
  */
-@Data
 public class TimeDTO {
 	
 	
 	/** Kafka 클라이언트 아이디(Producer, Consumer) */
+	@Getter
 	private final String clientId;
 	
 	/** 시간 */
+	@Getter
 	private final long time;
 	
 	
