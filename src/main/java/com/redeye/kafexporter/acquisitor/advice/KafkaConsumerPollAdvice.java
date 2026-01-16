@@ -34,6 +34,8 @@ public class KafkaConsumerPollAdvice {
 	 */
 	@Advice.OnMethodEnter
 	public static void onEnter(@Advice.This Object consumer) {
+		
+		System.out.println("#### POLL ON ENTER #2: ");
 
 		// 입력 값 및 큐 검사
 		if(consumer == null || queue == null) {
