@@ -30,7 +30,7 @@ public class HttpExporter {
 		this.server = HttpServer.create(new InetSocketAddress(port), 0);
 		
 		// url 별 컨텍스트 설정
-		this.server.createContext("/", new KafkaHttpHandler());
+		this.server.createContext("/kafka/config", new KafkaConfigHandler());
 	}
 
 	/**

@@ -185,6 +185,24 @@ public class KafkaAcquisitor {
 	}
 	
 	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public static Map<String, Map<String, Object>> getProducerConfigMap() {
+		return producerConfigMap;
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public static Map<String, Map<String, Object>> getConsumerConfigMap() {
+		return consumerConfigMap;
+	}
+	
+	/**
 	 * 설정 속성 값 반환
 	 * 
 	 * @param clientId 클라이언트 아이디
