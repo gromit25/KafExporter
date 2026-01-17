@@ -2,6 +2,7 @@ package com.redeye.kafexporter.http;
 
 import java.net.InetSocketAddress;
 
+import com.redeye.kafexporter.http.kafka.KafkaConfigHandler;
 import com.sun.net.httpserver.HttpServer;
 
 @SuppressWarnings("restriction")
