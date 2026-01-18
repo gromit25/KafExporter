@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
-import com.redeye.kafexporter.http.AbstractJSONHandler;
 import com.redeye.kafexporter.util.JSONUtil;
+import com.redeye.kafexporter.util.http.service.Controller;
+import com.redeye.kafexporter.util.http.service.HttpMethod;
+import com.redeye.kafexporter.util.http.service.RequestHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 /**
@@ -14,10 +16,17 @@ import com.sun.net.httpserver.HttpExchange;
  * @author jmsohn
  */
 @SuppressWarnings("restriction")
-public class KafkaConfigHandler extends AbstractJSONHandler {
+@Controller(basePath = "/kafka/config")
+public class KafkaConfigController {
 
-	@Override
-	public String execute(HttpExchange exchange) {
+	/**
+	 * 
+	 * 
+	 * @param exchange
+	 * @return
+	 */
+	@RequestHandler(method = HttpMethod.GET)
+	public String getConfig(HttpExchange exchange) {
 		
 		// 설정 값 메시지 생성
 		Map<String, Object> configMap = new HashMap<>();

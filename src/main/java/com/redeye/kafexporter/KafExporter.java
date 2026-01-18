@@ -24,7 +24,7 @@ public class KafExporter {
 		
 		try {
 			
-			HttpExporter server = new HttpExporter(5551);
+			HttpExporter server = new HttpExporter("localhost", 5551);
 			server.start();
 			
 		} catch(Exception ex) {

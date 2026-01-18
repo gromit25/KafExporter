@@ -1,24 +1,22 @@
 package com.redeye.kafexporter.http;
 
-import java.net.InetSocketAddress;
-
-import com.redeye.kafexporter.http.kafka.KafkaClientHandler;
-import com.redeye.kafexporter.http.kafka.KafkaConfigHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.redeye.kafexporter.http.kafka.KafkaConfigController;
+import com.redeye.kafexporter.util.http.service.HttpService;
 
 @SuppressWarnings("restriction")
 public class HttpExporter {
 
 
-	private HttpServer server;
+	/** */
+	private HttpService service;
 	
 	
 	/**
 	 * 
 	 * @param port
 	 */
-	public HttpExporter(int port) throws Exception {
-		this.init(port);
+	public HttpExporter(String hostname, int port) throws Exception {
+		this.init(hostname, port);
 	}
 
 	/**
@@ -26,14 +24,13 @@ public class HttpExporter {
 	 * 
 	 * @param port
 	 */
-	private void init(int port) throws Exception {
+	private void init(String hostname, int port) throws Exception {
 		
 		// Http 서버 생성
-		this.server = HttpServer.create(new InetSocketAddress(port), 0);
+		this.service = new HttpService(hostname, port);
 		
-		// url 별 컨텍스트 설정
-		this.server.createContext("/kafka/config", new KafkaConfigHandler());
-		this.server.createContext("/kafka/client", new KafkaClientHandler());
+		// 컨트롤러 추가
+		this.service.addController(new KafkaConfigController());
 	}
 
 	/**
@@ -43,8 +40,8 @@ public class HttpExporter {
 	 */
 	public HttpExporter start() throws Exception {
 		
-		if(this.server!= null) {
-			this.server.start();
+		if(this.service != null) {
+			this.service.start();
 		}
 		
 		return this;
