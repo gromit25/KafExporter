@@ -16,7 +16,7 @@ import lombok.Getter;
  * @author jmsohn
  */
 @SuppressWarnings("restriction")
-public class HandlerDTO {
+class HandlerDTO {
 	
 	
 	/** */

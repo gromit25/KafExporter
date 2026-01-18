@@ -19,7 +19,7 @@ import lombok.Getter;
  * @author jmsohn
  */
 @SuppressWarnings("restriction")
-public class ControllerContext implements HttpHandler {
+class ControllerContext implements HttpHandler {
 	
 	
 	/** */
