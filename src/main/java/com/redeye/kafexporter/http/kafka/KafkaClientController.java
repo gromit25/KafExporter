@@ -1,8 +1,8 @@
 package com.redeye.kafexporter.http.kafka;
 
-import com.redeye.kafexporter.util.http.service.Controller;
 import com.redeye.kafexporter.util.http.service.HttpMethod;
-import com.redeye.kafexporter.util.http.service.RequestHandler;
+import com.redeye.kafexporter.util.http.service.annotation.Controller;
+import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
 import com.sun.net.httpserver.HttpExchange;
 
 /**
