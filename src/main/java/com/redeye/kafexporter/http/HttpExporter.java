@@ -2,6 +2,7 @@ package com.redeye.kafexporter.http;
 
 import java.net.InetSocketAddress;
 
+import com.redeye.kafexporter.http.kafka.KafkaClientHandler;
 import com.redeye.kafexporter.http.kafka.KafkaConfigHandler;
 import com.sun.net.httpserver.HttpServer;
 
@@ -32,6 +33,7 @@ public class HttpExporter {
 		
 		// url 별 컨텍스트 설정
 		this.server.createContext("/kafka/config", new KafkaConfigHandler());
+		this.server.createContext("/kafka/client", new KafkaClientHandler());
 	}
 
 	/**
