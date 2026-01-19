@@ -610,7 +610,7 @@ public class StringUtil {
 				upperSize = lowerSize;
 			}
 			
-			String pattern = patternBuilder.toString();
+			String fixPattern = patternBuilder.toString();
 			
 			// 패턴 문자열 매칭 수행
 			// ex) 상기 과정에서 분리해낸 "xyz"가 있는지 찾음
@@ -627,7 +627,7 @@ public class StringUtil {
 			// ex) 상기 예의 "defxyz"에서 "def"의 개수 즉 3을 저장
 			int count = 0;
 			
-			if(pattern.length() != 0 && isLastPattern == false) {
+			if(fixPattern.length() != 0 && isLastPattern == false) {
 				
 				// 수량자가 있고 뒤에 패턴 문자열이 있고
 				// 마지막 패턴이 아닌 경우
@@ -644,7 +644,7 @@ public class StringUtil {
 					char ch = str.charAt(index);
 					
 					// 읽은 문자와 패턴 문자열의 문자와 동일한 지 확인
-					if(StringUtil.isEqualChar(ch, pattern.charAt(pos), this.ignoreCase) == true) {
+					if(StringUtil.isEqualChar(ch, fixPattern.charAt(pos), this.ignoreCase) == true) {
 						// 패턴 문자열의 문자와 일치하는 경우
 						
 						// 패턴의 첫번재 문자가 일치하는 경우
@@ -657,7 +657,7 @@ public class StringUtil {
 						pos++;
 						
 						// 만일, 모든 패턴 문자열이 일치하면 중지함
-						if(pos == pattern.length()) {
+						if(pos == fixPattern.length()) {
 							isMatch = true;
 							break;
 						}
@@ -699,7 +699,7 @@ public class StringUtil {
 				// 다음 문자열 매치 검사를 위한 재귀 호출
 				return match(str, wPos, index+1);
 				
-			} else if(pattern.length() != 0 && isLastPattern == true) {
+			} else if(fixPattern.length() != 0 && isLastPattern == true) {
 				
 				// 수량자가 있고 뒤에 패턴 문자열이 있고
 				// 마지막 패턴인 경우
@@ -710,7 +710,7 @@ public class StringUtil {
 				
 				// 패턴의 뒤쪽 부터 매칭 수행
 				int index = 0;
-				for(;index < pattern.length(); index++) {
+				for(;index < fixPattern.length(); index++) {
 
 					// 만일, 대상 문자열 보다 패턴 문자열이 크면 false를 반환
 					if(str.length() - 1 - index == -1) {
@@ -718,7 +718,7 @@ public class StringUtil {
 					}
 					
 					// 현재 위치의 패턴 문자 
-					char patternCh = pattern.charAt(pattern.length() - 1 - index);
+					char patternCh = fixPattern.charAt(fixPattern.length() - 1 - index);
 					// 현재 위치의 대상 문자열 문자
 					char strCh = str.charAt(str.length() - 1 - index);
 					
@@ -726,6 +726,14 @@ public class StringUtil {
 					if(StringUtil.isEqualChar(patternCh, strCh, this.ignoreCase) == false) {
 						return false;
 					}
+				}
+				
+				// 수량자가 없는 경우를 제외하고, 매치된 문자열에 관한 정보를 추가함
+				// upperSize == 0일 경우 수량자가 없는 경우임
+				if(upperSize != 0) {
+					this.groups.add(str.substring(strStart, str.length() - fixPattern.length()));
+					this.starts.add(strStart);
+					this.lengths.add(count);
 				}
 				
 				// 문자 개수 계산
