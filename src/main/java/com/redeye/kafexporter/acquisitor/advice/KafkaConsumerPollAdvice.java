@@ -46,6 +46,7 @@ public class KafkaConsumerPollAdvice {
 			return;
 		}
 
+		// 큐에 데이터 전송
 		try {
 			queue.put(new TimeDTO(clientId, System.currentTimeMillis()));
 		} catch(Exception ex) {
