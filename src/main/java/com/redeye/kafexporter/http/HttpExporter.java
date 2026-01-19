@@ -1,8 +1,14 @@
 package com.redeye.kafexporter.http;
 
+import com.redeye.kafexporter.http.kafka.KafkaClientController;
 import com.redeye.kafexporter.http.kafka.KafkaConfigController;
 import com.redeye.kafexporter.util.http.service.HttpService;
 
+/**
+ * 
+ * 
+ * @author jmsohn
+ */
 @SuppressWarnings("restriction")
 public class HttpExporter {
 
@@ -31,6 +37,7 @@ public class HttpExporter {
 		
 		// 컨트롤러 추가
 		this.service.addController(new KafkaConfigController());
+		this.service.addController(new KafkaClientController());
 	}
 
 	/**
