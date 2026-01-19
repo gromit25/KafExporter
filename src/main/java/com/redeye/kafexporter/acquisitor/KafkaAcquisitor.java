@@ -2,6 +2,7 @@ package com.redeye.kafexporter.acquisitor;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -203,6 +204,42 @@ public class KafkaAcquisitor {
 	}
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public static Set<String> getProducerClientIdList() {
+		return getProducerConfigMap().keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public static Set<String> getConsumerClientIdList() {
+		return getConsumerConfigMap().keySet();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param clientId
+	 * @return
+	 */
+	public static Map<String, Object> getConfig(String clientId) {
+		
+		if(producerConfigMap != null && producerConfigMap.containsKey(clientId) == true) {
+			return producerConfigMap.get(clientId);
+		}
+		
+		if(consumerConfigMap != null && consumerConfigMap.containsKey(clientId) == true) {
+			return consumerConfigMap.get(clientId);
+		}
+		
+		return Map.of();
+	}
+	
+	/**
 	 * 설정 속성 값 반환
 	 * 
 	 * @param clientId 클라이언트 아이디
@@ -215,15 +252,7 @@ public class KafkaAcquisitor {
 			return null;
 		}
 		
-		if(producerConfigMap != null && producerConfigMap.containsKey(clientId) == true) {
-			return producerConfigMap.get(clientId).get(propName);
-		}
-		
-		if(consumerConfigMap != null && consumerConfigMap.containsKey(clientId) == true) {
-			return consumerConfigMap.get(clientId).get(propName);
-		}
-		
-		return null;
+		return getConfig(clientId).get(propName);
 	}
 
 	/**
