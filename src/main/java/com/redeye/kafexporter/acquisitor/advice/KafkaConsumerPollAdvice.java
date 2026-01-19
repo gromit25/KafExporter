@@ -35,8 +35,6 @@ public class KafkaConsumerPollAdvice {
 	@Advice.OnMethodExit
 	public static void onExit(@Advice.This Object consumer) {
 		
-		System.out.println("#### POLL ON ENTER #2: ");
-
 		// 입력 값 및 큐 검사
 		if(consumer == null || queue == null) {
 			return;
