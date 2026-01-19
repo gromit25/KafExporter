@@ -130,6 +130,10 @@ public class JSONUtil {
 			
 			return toJSON((List)obj);
 			
+		} else if(Set.class.isAssignableFrom(type) == true) {
+			
+			return toJSON((Set)obj);
+			
 		} else {
 			
 			if(TypeUtil.isPrimitive(type) == true) {
