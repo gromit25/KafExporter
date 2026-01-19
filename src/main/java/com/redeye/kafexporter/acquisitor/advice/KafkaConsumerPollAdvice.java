@@ -49,10 +49,7 @@ public class KafkaConsumerPollAdvice {
 		}
 
 		try {
-			
-			System.out.println("#### PUT INTERVAL: " + clientId);
 			queue.put(new TimeDTO(clientId, System.currentTimeMillis()));
-			
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
