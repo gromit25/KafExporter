@@ -47,11 +47,10 @@ public class KafkaAcquisitor {
 	/** (key: 클라이언트 아이디, value: 마지막 poll 호출 시간) */
 	private static final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
 	
-	
 	/** Kafka JMX 데이터 수집 객체 */
-	private static JMXService jmxSvc = new JMXService();
-
-
+	private static final JMXService svc = new JMXService();
+	
+	
 	/**
 	 * 초기화
 	 *
@@ -171,21 +170,6 @@ public class KafkaAcquisitor {
 	}
 	
 	/**
-	 * JMX 성능 정보 반환
-	 * 
-	 * @param query JMX 쿼리
-	 * @return 성능 정보 반환
-	 */
-	public Map<String, Map<String, Object>> getJMXMetrics(String query) throws Exception {
-		
-		if(StringUtil.isBlank(query) == true) {
-			throw new IllegalArgumentException("'query' is null.");
-		}
-		
-		return jmxSvc.getByQuery(query);
-	}
-	
-	/**
 	 * 
 	 * 
 	 * @return
@@ -272,5 +256,48 @@ public class KafkaAcquisitor {
 		} else {
 			return value.toString();
 		}
+	}
+	
+	/**
+	 * 시스템 JMX 성능 정보 수집
+	 * 
+	 * @return 수집된 JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> acquireSystemMetrics() throws Exception {
+		return svc.getByQuery(
+			"java.lang:type=OperatingSystem",
+			"SystemCpuLoad",
+			"FreePhysicalMemorySize"
+		);
+	}
+
+	/**
+	 * Producer JMX 성능 정보 수집
+	 * 
+	 * @return 수집된 JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> acquireProducerMetrics() throws Exception {
+		return svc.getByQuery(
+			"kafka.producer:client-id=*,type=producer-metrics",
+			"request-latency-avg",
+			"request-rate",
+			"record-error-rate",
+			"outgoing-byte-rate",
+			"buffer-total-bytes",
+			"buffer-available-bytes"
+		);
+	}
+	
+	/**
+	 * Producer JMX 성능 정보 수집
+	 * 
+	 * @return 수집된 JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> acquireConsumerMetrics() throws Exception {
+		return svc.getByQuery(
+			"kafka.consumer:client-id=*,type=consumer-coordinator-metrics",
+			"join-rate",
+			"sync-rate"
+		);
 	}
 }

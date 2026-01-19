@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
-import com.redeye.kafexporter.util.http.service.HttpMethod;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -25,7 +24,7 @@ public class KafkaConfigController {
 	 * @param exchange
 	 * @return
 	 */
-	@RequestHandler(method = HttpMethod.GET)
+	@RequestHandler
 	public String getConfig(HttpExchange exchange) {
 		
 		// 설정 값 메시지 생성

@@ -27,7 +27,7 @@ public class KafkaClientController {
 	 * @param exchange
 	 * @return
 	 */
-	@RequestHandler(method = HttpMethod.GET)
+	@RequestHandler
 	public String getClientIdList(HttpExchange exchange) {
 		
 		Map<String, Set<String>> clientIdMap = new HashMap<>();
@@ -45,7 +45,7 @@ public class KafkaClientController {
 	 * @param params
 	 * @return
 	 */
-	@RequestHandler(method = HttpMethod.GET, path = "/*/config")
+	@RequestHandler(path = "/*/config")
 	public String getClientConfig(HttpExchange exchange, List<String> params) {
 		
 		return JSONUtil.toJSON(

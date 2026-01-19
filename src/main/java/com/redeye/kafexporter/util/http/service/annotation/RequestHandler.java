@@ -21,5 +21,5 @@ public @interface RequestHandler {
 	String path() default "";
 	
 	/** */
-	HttpMethod[] method();
+	HttpMethod[] method() default HttpMethod.GET;
 }
