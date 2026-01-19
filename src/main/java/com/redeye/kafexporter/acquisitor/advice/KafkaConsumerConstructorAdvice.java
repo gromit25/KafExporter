@@ -39,7 +39,6 @@ public class KafkaConsumerConstructorAdvice {
 		}
 
 		// 클라이언트 아이디 맵에 저장
-		System.out.println("### PUT CLIENT ID: " + consumer.toString() + "," + clientId);
 		clientIdMap.put(consumer.toString(), clientId);
 	}
 	
