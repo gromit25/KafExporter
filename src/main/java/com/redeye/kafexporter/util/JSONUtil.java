@@ -2,6 +2,7 @@ package com.redeye.kafexporter.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -88,6 +89,22 @@ public class JSONUtil {
 		json.append("]");
 		
 		return json.toString();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param set
+	 * @return
+	 */
+	public static String toJSON(Set<?> set) {
+		
+		// 입력 값 검증
+		if(set == null) {
+			return "[]";
+		}
+		
+		return toJSON(List.of(set.toArray()));
 	}
 	
 	/**
