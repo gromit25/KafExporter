@@ -9,7 +9,6 @@ import com.redeye.kafexporter.util.http.service.HttpService;
  * 
  * @author jmsohn
  */
-@SuppressWarnings("restriction")
 public class HttpExporter {
 
 
