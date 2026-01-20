@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.acquisitor.advice;
+package com.redeye.kafexporter.acquisitor.advice.kafka;
 
 import java.lang.reflect.Method;
 import java.util.Map;

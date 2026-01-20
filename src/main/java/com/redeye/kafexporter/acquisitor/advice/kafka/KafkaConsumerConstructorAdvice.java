@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.acquisitor.advice;
+package com.redeye.kafexporter.acquisitor.advice.kafka;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
