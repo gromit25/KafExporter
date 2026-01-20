@@ -16,7 +16,7 @@ import com.sun.net.httpserver.HttpExchange;
 @Controller(basePath = "/kafka/metrics")
 public class KafkaMetricsController {
 	
-	@RequestHandler(method = HttpMethod.GET)
+	@RequestHandler
 	public static String getMetrics(HttpExchange exchange) throws Exception {
 		return JSONUtil.toJSON(KafkaAcquisitor.acquireSystemMetrics());
 	}
