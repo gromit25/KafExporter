@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
+import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;

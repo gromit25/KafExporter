@@ -2,7 +2,7 @@ package com.redeye.kafexporter;
 
 import java.lang.instrument.Instrumentation;
 
-import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
+import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.http.HttpExporter;
 
 /**

@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.acquisitor.model;
+package com.redeye.kafexporter.acquisitor.kafka.model;
 
 import lombok.Getter;
 

@@ -1,9 +1,9 @@
-package com.redeye.kafexporter.acquisitor.advice.kafka;
+package com.redeye.kafexporter.acquisitor.kafka.advice;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.redeye.kafexporter.acquisitor.Constants;
+import com.redeye.kafexporter.acquisitor.kafka.Constants;
 
 import net.bytebuddy.asm.Advice;
 

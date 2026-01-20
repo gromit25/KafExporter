@@ -3,7 +3,7 @@ package com.redeye.kafexporter.http.kafka;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
+import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;

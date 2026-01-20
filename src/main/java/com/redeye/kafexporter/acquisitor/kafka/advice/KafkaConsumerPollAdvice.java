@@ -1,8 +1,8 @@
-package com.redeye.kafexporter.acquisitor.advice.kafka;
+package com.redeye.kafexporter.acquisitor.kafka.advice;
 
 import java.util.concurrent.BlockingQueue;
 
-import com.redeye.kafexporter.acquisitor.model.ClientTimeDTO;
+import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
 
 import net.bytebuddy.asm.Advice;
 

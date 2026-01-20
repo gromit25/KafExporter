@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.acquisitor;
+package com.redeye.kafexporter.acquisitor.kafka;
 
 import java.lang.instrument.Instrumentation;
 import java.util.Map;
@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.redeye.kafexporter.util.StringUtil;
-import com.redeye.kafexporter.acquisitor.advice.kafka.ConsumerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.advice.kafka.KafkaConsumerConstructorAdvice;
-import com.redeye.kafexporter.acquisitor.advice.kafka.KafkaConsumerPollAdvice;
-import com.redeye.kafexporter.acquisitor.advice.kafka.ProducerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.model.ClientTimeDTO;
+import com.redeye.kafexporter.acquisitor.kafka.advice.ConsumerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerConstructorAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerPollAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.advice.ProducerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
 import com.redeye.kafexporter.util.jmx.JMXService;
 import com.redeye.kafexporter.util.stat.Parameter;
