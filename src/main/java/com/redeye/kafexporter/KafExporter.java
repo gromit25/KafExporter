@@ -3,7 +3,7 @@ package com.redeye.kafexporter;
 import java.lang.instrument.Instrumentation;
 
 import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
-import com.redeye.kafexporter.http.HttpExporter;
+import com.redeye.kafexporter.exporter.http.HttpExporter;
 
 /**
  * 카프카 정보 수집기 클래스

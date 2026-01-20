@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.http.kafka;
+package com.redeye.kafexporter.exporter.http.kafka;
 
 import java.util.HashMap;
 import java.util.List;

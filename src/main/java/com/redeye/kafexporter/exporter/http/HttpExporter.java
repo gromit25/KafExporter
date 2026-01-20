@@ -1,8 +1,8 @@
-package com.redeye.kafexporter.http;
+package com.redeye.kafexporter.exporter.http;
 
-import com.redeye.kafexporter.http.kafka.KafkaClientController;
-import com.redeye.kafexporter.http.kafka.KafkaConfigController;
-import com.redeye.kafexporter.http.kafka.KafkaMetricsController;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaClientController;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaConfigController;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaMetricsController;
 import com.redeye.kafexporter.util.http.service.HttpService;
 
 /**
@@ -35,7 +35,7 @@ public class HttpExporter {
 		// Http 서버 생성
 		this.service = new HttpService(hostname, port);
 		
-		// 컨트롤러 추가
+		// kafka 컨트롤러 추가
 		this.service.addController(new KafkaClientController());
 		this.service.addController(new KafkaConfigController());
 		this.service.addController(new KafkaMetricsController());
