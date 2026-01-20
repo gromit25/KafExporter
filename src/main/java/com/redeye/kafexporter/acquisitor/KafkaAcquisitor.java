@@ -12,7 +12,7 @@ import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerPollAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerConstructorAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.model.TimeDTO;
+import com.redeye.kafexporter.acquisitor.model.ClientTimeDTO;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
 import com.redeye.kafexporter.util.jmx.JMXService;
 import com.redeye.kafexporter.util.stat.Parameter;
@@ -36,10 +36,10 @@ public class KafkaAcquisitor {
 	private static final Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static final BlockingQueue<TimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
+	private static final BlockingQueue<ClientTimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
 
 	/** */
-	private static QueueDaemon<TimeDTO> pollTimeDaemon = null;
+	private static QueueDaemon<ClientTimeDTO> pollTimeDaemon = null;
 	
 	/** */
 	private static final Map<String, Parameter> pollTimeStatMap = new ConcurrentHashMap<>();

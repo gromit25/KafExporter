@@ -7,7 +7,7 @@ import lombok.Getter;
  * 
  * @author jmsohn
  */
-public class TimeDTO {
+public class ClientTimeDTO {
 	
 	
 	/** Kafka 클라이언트 아이디(Producer, Consumer) */
@@ -25,7 +25,7 @@ public class TimeDTO {
 	 * @param clientId Kafka 클라이언트 아이디
 	 * @param time 시간
 	 */
-	public TimeDTO(String clientId, long time) {
+	public ClientTimeDTO(String clientId, long time) {
 		this.clientId = clientId;
 		this.time = time;
 	}

@@ -2,7 +2,7 @@ package com.redeye.kafexporter.acquisitor.advice;
 
 import java.util.concurrent.BlockingQueue;
 
-import com.redeye.kafexporter.acquisitor.model.TimeDTO;
+import com.redeye.kafexporter.acquisitor.model.ClientTimeDTO;
 
 import net.bytebuddy.asm.Advice;
 
@@ -15,7 +15,7 @@ public class KafkaConsumerPollAdvice {
 
 	
 	/** */
-	public static BlockingQueue<TimeDTO> queue;
+	public static BlockingQueue<ClientTimeDTO> queue;
 	
 	
 	/**
@@ -23,7 +23,7 @@ public class KafkaConsumerPollAdvice {
 	 *
 	 * @param queue
 	 */
-	public static void init(BlockingQueue<TimeDTO> queue) {
+	public static void init(BlockingQueue<ClientTimeDTO> queue) {
 		KafkaConsumerPollAdvice.queue = queue;
 	}
 	
@@ -48,7 +48,7 @@ public class KafkaConsumerPollAdvice {
 
 		// 큐에 데이터 전송
 		try {
-			queue.put(new TimeDTO(clientId, System.currentTimeMillis()));
+			queue.put(new ClientTimeDTO(clientId, System.currentTimeMillis()));
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
