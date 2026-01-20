@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.acquisitor.jmx;
+package com.redeye.kafexporter.util.jmx;
 
 import java.io.Closeable;
 import java.io.IOException;

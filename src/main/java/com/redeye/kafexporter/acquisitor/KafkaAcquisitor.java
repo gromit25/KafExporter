@@ -12,9 +12,9 @@ import com.redeye.kafexporter.acquisitor.advice.ConsumerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerPollAdvice;
 import com.redeye.kafexporter.acquisitor.advice.KafkaConsumerConstructorAdvice;
 import com.redeye.kafexporter.acquisitor.advice.ProducerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.jmx.JMXService;
 import com.redeye.kafexporter.acquisitor.model.TimeDTO;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
+import com.redeye.kafexporter.util.jmx.JMXService;
 import com.redeye.kafexporter.util.stat.Parameter;
 
 import net.bytebuddy.agent.builder.AgentBuilder;

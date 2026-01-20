@@ -3,7 +3,7 @@ package com.redeye.kafexporter.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.redeye.kafexporter.acquisitor.jmx.JMXService;
+import com.redeye.kafexporter.util.jmx.JMXService;
 
 /**
  * 
