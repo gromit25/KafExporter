@@ -6,26 +6,28 @@ import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
 import com.redeye.kafexporter.http.HttpExporter;
 
 /**
- * 
+ * 카프카 정보 수집기 클래스
  * 
  * @author jmsohn
  */
 public class KafExporter {
 	
 	/**
+	 * 메인 메소드
 	 * 
-	 * 
-	 * @param args
-	 * @param inst
+	 * @param args javaagent 옵션 문자열
+	 * @param inst java 인스트루먼트 클래스
 	 */
 	public static void premain(String args, Instrumentation inst) {
 		
-		KafkaAcquisitor.init(inst);
-		
 		try {
+
+			// kafka 정보 수집기 초기화
+			KafkaAcquisitor.init(inst);
 			
-			HttpExporter server = new HttpExporter("localhost", 5551);
-			server.start();
+			// exporter 서버 기동
+			HttpExporter exporterServer = new HttpExporter("localhost", 5551);
+			exporterServer.start();
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
