@@ -5,17 +5,19 @@ import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.HttpMethod;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
+import com.sun.net.httpserver.HttpExchange;
 
 /**
  * 
  * 
  * @author jmsohn
  */
+@SuppressWarnings("restriction")
 @Controller(basePath = "/kafka/metrics")
 public class KafkaMetricsController {
 	
 	@RequestHandler(method = HttpMethod.GET)
-	public static String getMetrics() throws Exception {
+	public static String getMetrics(HttpExchange exchange) throws Exception {
 		return JSONUtil.toJSON(KafkaAcquisitor.acquireSystemMetrics());
 	}
 }
