@@ -1,5 +1,8 @@
 package com.redeye.kafexporter.http.kafka;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.redeye.kafexporter.acquisitor.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
@@ -17,6 +20,13 @@ public class KafkaMetricsController {
 	
 	@RequestHandler
 	public static String getMetrics(HttpExchange exchange) throws Exception {
-		return JSONUtil.toJSON(KafkaAcquisitor.acquireSystemMetrics());
+		
+		Map<String, Object> metricsMap = new HashMap<>();
+		
+		metricsMap.put("system", KafkaAcquisitor.acquireSystemMetrics());
+		metricsMap.put("producer", KafkaAcquisitor.acquireProducerMetrics());
+		metricsMap.put("consumer", KafkaAcquisitor.acquireConsumerMetrics());
+		
+		return JSONUtil.toJSON(metricsMap);
 	}
 }
