@@ -189,10 +189,11 @@ public class Statistic {
 				(n / ((n - 1) * (n - 2)))
 				* (
 					this.cubedSum
+					- (3 * mean * this.squaredSum)
+					+ (3 * squaredMean * this.sum)
 					- (cubedMean * n)
-					- (3 * this.mean * this.variance * (n - 1))
 				)
-				/ Math.pow(this.variance, 3.0/2.0);
+				/ Math.pow(this.variance, 1.5);
 		}
 		
 		//---- 첨도 계산
@@ -206,8 +207,9 @@ public class Statistic {
 					* (
 						this.fourthPoweredSum
 						- (4 * this.mean * this.cubedSum)
-						+ (6 * squaredMean * this.variance * (n - 1))
-						+ (3 * fourthPoweredMean * n)
+						+ (6 * squaredMean * this.squaredSum)
+						- (4 * cubedMean * this.sum)
+						+ (fourthPoweredMean * n)
 					)
 		  		)
 				/ (this.variance * this.variance)
