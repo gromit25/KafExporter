@@ -6,6 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.sun.net.httpserver.HttpServer;
 
+import lombok.Getter;
+
 /**
  * 
  * 
@@ -19,6 +21,14 @@ public class HttpService {
 	private HttpServer server;
 	
 	/** */
+	@Getter
+	private String hostName;
+	
+	/** */
+	@Getter
+	private int port;
+	
+	/** */
 	private final List<ControllerContext> controllerList = new CopyOnWriteArrayList<>();
 	
 	
@@ -30,7 +40,15 @@ public class HttpService {
 	 */
 	public HttpService(String host, int port) throws Exception {
 		
+		
 		this.server = HttpServer.create(new InetSocketAddress(host, port), 0);
+		
+		// 할당된 호스트명과 포트 번호 획득
+		// port 번호가 0일 경우 임의의 포트가 할당됨
+		InetSocketAddress addr = this.server.getAddress();
+		
+		this.hostName = addr.getHostName();
+		this.port = addr.getPort();
 	}
 	
 	/**
@@ -71,5 +89,13 @@ public class HttpService {
 		this.server.stop(1000);
 		
 		return this;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getHostStr() {
+		return this.getHostName() + ":" + this.getPort();
 	}
 }
