@@ -804,4 +804,44 @@ public class StringUtil {
 			this.lengths = lengths;
 		}
 	}
+
+	/**
+	 * 문자열 내에 null(\0)가 포함 여부 반환<br>
+	 * 포함되어 있을 경우 true<br>
+	 * ex) "test.jsp\0.doc" 일 경우 true
+	 * 
+	 * @param contents 문자열
+	 * @return null(\0) 포함 여부
+	 */
+	public static boolean hasNull(String contents) throws Exception {
+		
+		if(contents == null) {
+			throw new Exception("contents is null");
+		}
+		
+		for(int index = 0; index < contents.length(); index++) {
+			char ch = contents.charAt(index);
+			if(ch == '\0') {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * 문자열을 역전 시켜 반환하는 메소드<br>
+	 * ex) abc -> cba 
+	 * 
+	 * @param str 역전시킬 문자열
+	 * @return 역전된 문자열
+	 */
+	public static String reverse(String str) throws Exception {
+		
+		if(str == null) {
+			throw new NullPointerException("str is null");
+		}
+		
+		return new StringBuilder(str).reverse().toString();
+	}
 }
