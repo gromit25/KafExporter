@@ -3,6 +3,7 @@ package com.redeye.kafexporter.util.http.service;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -37,10 +38,11 @@ public class HttpService {
 	 * 
 	 * @param host
 	 * @param port
+	 * @param threadCount
 	 */
-	public HttpService(String host, int port) throws Exception {
+	public HttpService(String host, int port, int threadCount) throws Exception {
 		
-		
+		// Http 서버 생성
 		this.server = HttpServer.create(new InetSocketAddress(host, port), 0);
 		
 		// 할당된 호스트명과 포트 번호 획득
@@ -49,6 +51,13 @@ public class HttpService {
 		
 		this.hostName = addr.getHostName();
 		this.port = addr.getPort();
+		
+		// 스레드 풀 설정
+		if(threadCount > 0) {
+			this.server.setExecutor(Executors.newFixedThreadPool(threadCount));
+		} else {
+			this.server.setExecutor(Executors.newCachedThreadPool());
+		}
 	}
 	
 	/**

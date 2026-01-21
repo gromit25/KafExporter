@@ -21,8 +21,8 @@ public class HttpExporter {
 	 * 
 	 * @param port
 	 */
-	public HttpExporter(String hostname, int port) throws Exception {
-		this.init(hostname, port);
+	public HttpExporter(String hostname, int port, int threadCount) throws Exception {
+		this.init(hostname, port, threadCount);
 	}
 
 	/**
@@ -30,10 +30,10 @@ public class HttpExporter {
 	 * 
 	 * @param port
 	 */
-	private void init(String hostname, int port) throws Exception {
+	private void init(String hostname, int port, int threadCount) throws Exception {
 		
 		// Http 서버 생성
-		this.service = new HttpService(hostname, port);
+		this.service = new HttpService(hostname, port, threadCount);
 		
 		// kafka 컨트롤러 추가
 		this.service.addController(new KafkaClientController());

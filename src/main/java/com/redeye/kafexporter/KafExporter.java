@@ -48,15 +48,38 @@ public class KafExporter {
 					port = Integer.parseInt(hostPort[1]);
 				}
 			}
+			
+			// exporter 서버의 스레드 개수 설정
+			int threadCount = Integer
+				.parseInt(
+					getEnv("AGENT_EXPORTER_THREAD_COUNT", "-1")
+				);
 
 			// exporter 서버 기동
-			HttpExporter exporterServer = new HttpExporter(host, port);
+			HttpExporter exporterServer = new HttpExporter(host, port, threadCount);
 			exporterServer.start();
 			
 			System.out.println("exporter server(" + exporterServer.getHostStr() + ") is started.");
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param name
+	 * @return
+	 */
+	private static String getEnv(String name, String defaultValue) {
+		
+		String value = System.getenv(name);
+		
+		if(StringUtil.isBlank(value) == true) {
+			return defaultValue;
+		} else {
+			return value;
 		}
 	}
 }
