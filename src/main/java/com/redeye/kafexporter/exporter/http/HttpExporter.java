@@ -54,4 +54,30 @@ public class HttpExporter {
 		
 		return this;
 	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getHostName() {
+		return this.service.getHostName();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getPort() {
+		return this.service.getPort();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getHostStr() {
+		return this.service.getHostStr();
+	}
 }
