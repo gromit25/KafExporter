@@ -53,6 +53,8 @@ public class KafExporter {
 			HttpExporter exporterServer = new HttpExporter(host, port);
 			exporterServer.start();
 			
+			System.out.println("exporter server(" + exporterServer.getHostStr() + ") is started.");
+			
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
