@@ -7,25 +7,22 @@ import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
-import com.sun.net.httpserver.HttpExchange;
 
 /**
  * 
  * 
  * @author jmsohn
  */
-@SuppressWarnings("restriction")
 @Controller(basePath = "/kafka/config")
 public class KafkaConfigController {
 
 	/**
 	 * 
 	 * 
-	 * @param exchange
 	 * @return
 	 */
 	@RequestHandler
-	public String getConfig(HttpExchange exchange) {
+	public String getConfig() {
 		
 		// 설정 값 메시지 생성
 		Map<String, Object> configMap = new HashMap<>();
