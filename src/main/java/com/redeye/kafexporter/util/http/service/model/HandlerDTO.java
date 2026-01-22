@@ -1,4 +1,4 @@
-package com.redeye.kafexporter.util.http.service;
+package com.redeye.kafexporter.util.http.service.model;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.redeye.kafexporter.util.StringUtil;
+import com.redeye.kafexporter.util.http.service.HttpMethod;
 import com.sun.net.httpserver.HttpExchange;
 
 import lombok.Getter;
@@ -17,7 +18,7 @@ import lombok.Getter;
  * @author jmsohn
  */
 @SuppressWarnings("restriction")
-class HandlerDTO {
+public class HandlerDTO {
 	
 	
 	/**

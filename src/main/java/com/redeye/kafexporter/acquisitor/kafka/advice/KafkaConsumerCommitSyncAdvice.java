@@ -9,6 +9,11 @@ import net.bytebuddy.asm.Advice;
  */
 public class KafkaConsumerCommitSyncAdvice {
 	
+	/**
+	 * 
+	 * 
+	 * @param consumer
+	 */
 	@Advice.OnMethodExit
 	public static void onExit(@Advice.This Object consumer) {
 		

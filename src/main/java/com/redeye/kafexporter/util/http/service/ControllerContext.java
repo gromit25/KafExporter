@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
+import com.redeye.kafexporter.util.http.service.model.HandlerDTO;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
