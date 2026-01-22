@@ -9,25 +9,22 @@ import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.util.JSONUtil;
 import com.redeye.kafexporter.util.http.service.annotation.Controller;
 import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
-import com.sun.net.httpserver.HttpExchange;
 
 /**
  * 
  * 
  * @author jmsohn
  */
-@SuppressWarnings("restriction")
 @Controller(basePath = "/kafka/client")
 public class KafkaClientController {
 
 	/**
 	 * 
 	 * 
-	 * @param exchange
 	 * @return
 	 */
 	@RequestHandler
-	public String getClientIdList(HttpExchange exchange) {
+	public String getClientIdList() {
 		
 		Map<String, Set<String>> clientIdMap = new HashMap<>();
 		
@@ -41,15 +38,15 @@ public class KafkaClientController {
 	 * 
 	 * 
 	 * @param exchange
-	 * @param params
+	 * @param pathList
 	 * @return
 	 */
 	@RequestHandler(path = "/*/config")
-	public String getClientConfig(HttpExchange exchange, List<String> params) {
+	public String getClientConfig(List<String> pathList) {
 		
 		return JSONUtil.toJSON(
 			KafkaAcquisitor.getConfig(
-				params.get(0)	// Client Id
+				pathList.get(0)	// Client Id
 			)
 		); 
 	}
