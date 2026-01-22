@@ -3,12 +3,13 @@ package com.redeye.kafexporter;
 import java.lang.instrument.Instrumentation;
 
 import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
+import com.redeye.kafexporter.acquisitor.kafka.KafkaTransformer;
 import com.redeye.kafexporter.exporter.http.HttpExporter;
 import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.util.WebUtil;
 
 /**
- * 카프카 정보 수집기 클래스
+ * kafka 정보 수집기 클래스
  * 
  * @author jmsohn
  */
@@ -24,10 +25,13 @@ public class KafExporter {
 		
 		try {
 
-			// 1. kafka 정보 수집기 초기화
-			KafkaAcquisitor.init(inst);
+			// ----- kafka 메소드 변환 클래스
+			KafkaTransformer.addKafkaTransformer(inst);
 			
-			// 2. exporter 서버 기동
+			// ----- kafka 정보 수집기 초기화
+			KafkaAcquisitor.init();
+			
+			// ----- exporter 서버 기동
 			
 			// export 서버명
 			String host = "localhost";
@@ -67,10 +71,11 @@ public class KafExporter {
 	}
 	
 	/**
+	 * 환경 변수 설정 값 반환
 	 * 
-	 * 
-	 * @param name
-	 * @return
+	 * @param name 환경 변수 명
+	 * @param defaultValue 환경 변수 미설정시 반환할 값
+	 * @return 환경 변수 설정 값
 	 */
 	private static String getEnv(String name, String defaultValue) {
 		
