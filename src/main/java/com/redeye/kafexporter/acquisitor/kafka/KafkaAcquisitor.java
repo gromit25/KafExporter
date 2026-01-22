@@ -1,6 +1,5 @@
 package com.redeye.kafexporter.acquisitor.kafka;
 
-import java.lang.instrument.Instrumentation;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,19 +7,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.redeye.kafexporter.util.StringUtil;
-import com.redeye.kafexporter.acquisitor.kafka.advice.ConsumerConfigAdvice;
-import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerConstructorAdvice;
-import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerPollAdvice;
-import com.redeye.kafexporter.acquisitor.kafka.advice.ProducerConfigAdvice;
 import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
+import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.util.daemon.QueueDaemon;
 import com.redeye.kafexporter.util.jmx.JMXService;
 import com.redeye.kafexporter.util.stat.Parameter;
-
-import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.matcher.ElementMatchers;
 
 /**
  * Kafka 정보 수집기
@@ -31,14 +22,15 @@ public class KafkaAcquisitor {
 	
 
 	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
-	private static final Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
+	static final Map<String, Map<String, Object>> producerConfigMap = new ConcurrentHashMap<>();
 
 	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
-	private static final Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
+	static final Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
 	/** polling 시간 수집 큐 */
-	private static final BlockingQueue<ClientTimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
-
+	static final BlockingQueue<ClientTimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
+ 
+	
 	/** */
 	private static QueueDaemon<ClientTimeDTO> pollTimeDaemon = null;
 	
@@ -54,23 +46,13 @@ public class KafkaAcquisitor {
 	
 	/**
 	 * 초기화
-	 *
-	 * @param inst Java 인스트루먼트 객체
 	 */
-	public static void init(Instrumentation inst) {
+	public static void init() {
 
-		// 입력값 검증
-		if(inst == null) {
-			throw new IllegalArgumentException("'inst' is null.");
-		}
-		
-		// Kafka 메소드 인터셉터 등록
-		addKafkaTransformer(inst);
-		
 		//
 		pollTimeDaemon = new QueueDaemon<>(
 			pollTimeQueue,
-			(data) -> {
+			data -> {
 				
 				// 기존 값 저장 
 				Long prePollTime = pollTimeMap.get(data.getClientId());
@@ -93,81 +75,6 @@ public class KafkaAcquisitor {
 		);
 		
 		pollTimeDaemon.run();
-	}
-	
-	/**
-	 * 메소드 인터셉터 등록 - 바이트 코드 변환
-	 * 
-	 * @param inst Java 인스트루먼트 객체
-	 */
-	private static void addKafkaTransformer(Instrumentation inst) {
-		
-		// --- Kafka ProducerConfig 메소드 훅킹 설정
-		
-		// Kafka ProducerConfig 생성자 호출 어드바이스 설정
-		ProducerConfigAdvice.init(producerConfigMap);
-			
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.apache.kafka.clients.producer.ProducerConfig"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectedDomain) -> {
-					return builder
-						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(ProducerConfigAdvice.class));
-				}
-			)
-        	.installOn(inst);
-		
-		// --- Kafka ConsumerConfig 메소드 훅킹 설정
-		
-		// Kafka ConsumerConfig 생성자 호출 어드바이스 설정
-		ConsumerConfigAdvice.init(consumerConfigMap);
-		
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.ConsumerConfig"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectedDomain) -> {
-					return builder
-						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(ConsumerConfigAdvice.class));
-				}
-			)
-			.installOn(inst);
-		
-		// --- KafkaConsumer 메소드 훅킹 설정
-		
-		// 초기화
-		KafkaConsumerPollAdvice.init(pollTimeQueue);
-
-		// KafkaConsumer의 생성자 호출 어드바이스 설정
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.apache.kafka.clients.consumer.KafkaConsumer"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectionDomain) -> { 
-					return builder
-						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(KafkaConsumerConstructorAdvice.class))
-						.visit(
-							Advice
-								.to(KafkaConsumerPollAdvice.class)
-								.on(ElementMatchers.named("poll")
-								.and(ElementMatchers.takesArguments(1)))
-						);
-				}
-			)
-			.installOn(inst);
-		
-		// 스프링부트의 KafkaConsumer의 생성자 호출 어드바이스 설정
-		new AgentBuilder.Default()
-			.type(ElementMatchers.named("org.springframework.kafka.core.DefaultKafkaConsumerFactory$ExtendedKafkaConsumer"))
-			.transform(
-				(builder, typeDescription, classLoader, module, protectionDomain) -> { 
-					return builder
-						.constructor(ElementMatchers.any())
-						.intercept(Advice.to(KafkaConsumerConstructorAdvice.class));
-				}
-			)
-			.installOn(inst);
 	}
 	
 	/**
