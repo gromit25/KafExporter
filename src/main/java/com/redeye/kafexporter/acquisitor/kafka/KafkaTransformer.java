@@ -3,6 +3,8 @@ package com.redeye.kafexporter.acquisitor.kafka;
 import java.lang.instrument.Instrumentation;
 
 import com.redeye.kafexporter.acquisitor.kafka.advice.ConsumerConfigAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerCommitAsyncAdvice;
+import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerCommitSyncAdvice;
 import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerConstructorAdvice;
 import com.redeye.kafexporter.acquisitor.kafka.advice.KafkaConsumerPollAdvice;
 import com.redeye.kafexporter.acquisitor.kafka.advice.ProducerConfigAdvice;
@@ -78,8 +80,21 @@ public class KafkaTransformer {
 						.visit(
 							Advice
 								.to(KafkaConsumerPollAdvice.class)
-								.on(ElementMatchers.named("poll")
-								.and(ElementMatchers.takesArguments(1)))
+								.on(
+									ElementMatchers
+										.named("poll")
+										.and(ElementMatchers.takesArguments(1))
+								)
+						)
+						.visit(
+							Advice
+								.to(KafkaConsumerCommitAsyncAdvice.class)
+								.on(ElementMatchers.named("commitAsync"))
+						)
+						.visit(
+							Advice
+								.to(KafkaConsumerCommitSyncAdvice.class)
+								.on(ElementMatchers.named("commitSync"))
 						);
 				}
 			)
