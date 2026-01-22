@@ -1,6 +1,7 @@
 package com.redeye.kafexporter.acquisitor.kafka;
 
 import java.lang.instrument.Instrumentation;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -270,21 +271,50 @@ public class KafkaAcquisitor {
 			"FreePhysicalMemorySize"
 		);
 	}
-
+	
+	/**
+	 * Producer JMX 성능 정보 수집
+	 * 
+	 * @param attrs 속성명
+	 * @return 수집된 JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> acquireProducerMetrics(List<String> attrs) throws Exception {
+		return svc.getByQuery(
+			"kafka.producer:client-id=*,type=producer-metrics",
+			attrs.toArray(new String[0])
+		);
+	}
+	
 	/**
 	 * Producer JMX 성능 정보 수집
 	 * 
 	 * @return 수집된 JMX 성능 정보
 	 */
 	public static Map<String, Map<String, Object>> acquireProducerMetrics() throws Exception {
+		return acquireProducerMetrics(
+			List.of(
+				"record-send-rate",
+				"record-error-rate",
+				"request-latency-avg",
+				"request-latency-max",
+				"request-error-rate",
+				"request-error-total",
+				"buffer-total-bytes",
+				"buffer-available-bytes"
+			)
+		);
+	}
+	
+	/**
+	 * Producer JMX 성능 정보 수집
+	 * 
+	 * @param attrs 속성명
+	 * @return 수집된 JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> acquireConsumerMetrics(List<String> attrs) throws Exception {
 		return svc.getByQuery(
-			"kafka.producer:client-id=*,type=producer-metrics",
-			"request-latency-avg",
-			"request-rate",
-			"record-error-rate",
-			"outgoing-byte-rate",
-			"buffer-total-bytes",
-			"buffer-available-bytes"
+			"kafka.consumer:client-id=*,type=consumer-coordinator-metrics",
+			attrs.toArray(new String[0])
 		);
 	}
 	
@@ -294,10 +324,11 @@ public class KafkaAcquisitor {
 	 * @return 수집된 JMX 성능 정보
 	 */
 	public static Map<String, Map<String, Object>> acquireConsumerMetrics() throws Exception {
-		return svc.getByQuery(
-			"kafka.consumer:client-id=*,type=consumer-coordinator-metrics",
-			"join-rate",
-			"sync-rate"
+		return acquireConsumerMetrics(
+			List.of(
+				"join-rate",
+				"sync-rate"
+			)
 		);
 	}
 }
