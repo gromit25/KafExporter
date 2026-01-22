@@ -24,8 +24,11 @@ class HandlerDTO {
 	 * 
 	 */
 	private enum MethodType {
-		ONE_PARAM,
-		TWO_PARAM;
+		NON_PARAM,
+		EXCHANGE_PARAM_ONLY,
+		PATHLIST_PARAM_ONLY,
+		EXCHANGE_PATHLIST_PARAM,
+		PATHLIST_EXCHANGE_PARAM;
 	}
 	
 	
@@ -90,24 +93,33 @@ class HandlerDTO {
 		MethodType methodType = null;
 		
 		Class<?>[] parameterTypes = method.getParameterTypes();
-		if(parameterTypes.length == 1) {
-			methodType = MethodType.ONE_PARAM;
-		} else if(parameterTypes.length == 2) {
-			methodType = MethodType.TWO_PARAM;
-		} else {
-			throw new RuntimeException(method +  " must have 1 or 2 params.");
-		}
-
-		// 첫 번째 파라미터: HttpExchange
-		if(parameterTypes[0].equals(HttpExchange.class) == false) {
-			throw new RuntimeException(method +  " first param must be HttpExchange.");
-		}
-
-		// 두 번째 파라미터: List
-		if(methodType == MethodType.TWO_PARAM) {
-			if(parameterTypes[1].equals(List.class) == false) {
-				throw new RuntimeException(method +  " second param must be List.");
+		
+		if(parameterTypes.length == 0) {
+			
+			methodType = MethodType.NON_PARAM;
+			
+		} else if(parameterTypes.length == 1) {
+			
+			if(parameterTypes[0].equals(HttpExchange.class) == true) {
+				methodType = MethodType.EXCHANGE_PARAM_ONLY;
+			} else if(parameterTypes[0].equals(List.class) == true) {
+				methodType = MethodType.PATHLIST_PARAM_ONLY;
+			} else {
+				throw new RuntimeException("unexpected param type: " + parameterTypes[0]);
 			}
+			
+		} else if(parameterTypes.length == 2) {
+			
+			if(parameterTypes[0].equals(HttpExchange.class) == true && parameterTypes[1].equals(List.class) == true) {
+				methodType = MethodType.EXCHANGE_PARAM_ONLY;
+			} else if(parameterTypes[0].equals(List.class) == true && parameterTypes[1].equals(HttpExchange.class) == true) {
+				methodType = MethodType.PATHLIST_PARAM_ONLY;
+			} else {
+				throw new RuntimeException("unexpected param type: " + parameterTypes[0] + ", " + parameterTypes[1]);
+			}
+			
+		} else {
+			throw new RuntimeException(method +  " must have 0, 1, 2 params.");
 		}
 
 		return methodType;
@@ -158,16 +170,33 @@ class HandlerDTO {
 		//
 		Object retrival = null;
 		
-		if(this.methodType == MethodType.ONE_PARAM) {
+		//
+		String path = exchange.getRequestURI().getPath();
+		List<String> pathList = this.pathPattern.match(path).getGroups();
+		
+		switch(this.methodType) {
+		case NON_PARAM:
+			retrival = this.method.invoke(obj);
+			break;
 			
+		case EXCHANGE_PARAM_ONLY:
 			retrival = this.method.invoke(obj, exchange);
+			break;
 			
-		} else if(this.methodType == MethodType.TWO_PARAM) {
+		case PATHLIST_PARAM_ONLY:
+			retrival = this.method.invoke(obj, pathList);
+			break;
 			
-			String path = exchange.getRequestURI().getPath();
-			List<String> params = this.pathPattern.match(path).getGroups();
+		case EXCHANGE_PATHLIST_PARAM:
+			retrival = this.method.invoke(obj, exchange, pathList);
+			break;
 			
-			retrival = this.method.invoke(obj, exchange, params);
+		case PATHLIST_EXCHANGE_PARAM:
+			retrival = this.method.invoke(obj, pathList, exchange);
+			break;
+			
+		default:
+			throw new RuntimeException("unexpected type: " + this.methodType);
 		}
 		
 		//
