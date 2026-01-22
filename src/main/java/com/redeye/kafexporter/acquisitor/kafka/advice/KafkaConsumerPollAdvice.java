@@ -7,7 +7,7 @@ import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
 import net.bytebuddy.asm.Advice;
 
 /**
- * KafkaConsumer 어드바이스 클래스
+ * KafkaConsumer poll 어드바이스 클래스
  * 
  * @author jmsohn
  */
