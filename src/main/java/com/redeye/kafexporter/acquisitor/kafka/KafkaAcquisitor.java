@@ -220,7 +220,7 @@ public class KafkaAcquisitor {
 	 */
 	public static Map<String, Map<String, Object>> acquireConsumerMetrics(List<String> attrs) throws Exception {
 		return svc.getByQuery(
-			"kafka.consumer:client-id=*,type=consumer-coordinator-metrics",
+			"kafka.consumer:client-id=*,type=consumer-metrics",
 			attrs.toArray(new String[0])
 		);
 	}
@@ -233,8 +233,12 @@ public class KafkaAcquisitor {
 	public static Map<String, Map<String, Object>> acquireConsumerMetrics() throws Exception {
 		return acquireConsumerMetrics(
 			List.of(
-				"join-rate",
-				"sync-rate"
+				"records-consumed-rate",
+				"poll-latency-avg",
+				"poll-rate",
+				"commit-latency-avg",
+				"commit-rate",
+				"commit-total"
 			)
 		);
 	}
