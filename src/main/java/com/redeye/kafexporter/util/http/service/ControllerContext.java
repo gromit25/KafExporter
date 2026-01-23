@@ -135,10 +135,10 @@ class ControllerContext implements HttpHandler {
 	}
 	
 	/**
+	 * Http 요청에 매치되는 요청 처리 핸들러 반환
 	 * 
-	 * 
-	 * @param exchange
-	 * @return
+	 * @param exchange Http 요청
+	 * @return 요청 처리 핸들러
 	 * @throws NotFoundException 매치되는 핸들러가 없을 경우 발생
 	 */
 	private HandlerDTO getMatchedHandler(HttpExchange exchange) throws NotFoundException {
