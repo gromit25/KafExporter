@@ -175,14 +175,19 @@ public class Statistic {
 
 		//---- 분산 계산
 		if(n < 2) {
+			
 			this.variance = 0.0;
+			
 		} else {
+			
 			this.variance = (this.squaredSum - (squaredMean * n)) / (n - 1);
 		}
 		
 		//---- 왜도 계산
 		if(n < 3 || this.variance == 0) {
+			
 			this.skewness = 0.0;
+			
 		} else {
 			
 			this.skewness =
@@ -198,7 +203,9 @@ public class Statistic {
 		
 		//---- 첨도 계산
 		if(n < 4 || this.variance == 0) {
+			
 			this.kurtosis = 0.0;
+			
 		} else {
 			
 			this.kurtosis =
@@ -211,8 +218,8 @@ public class Statistic {
 						- (4 * cubedMean * this.sum)
 						+ (fourthPoweredMean * n)
 					)
+					/ (this.variance * this.variance)
 		  		)
-				/ (this.variance * this.variance)
 				- (3 * (n - 1) * (n - 1)) / ((n - 2) * (n - 3));
 		}
 	}

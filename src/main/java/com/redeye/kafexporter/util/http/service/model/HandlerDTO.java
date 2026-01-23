@@ -13,7 +13,7 @@ import com.sun.net.httpserver.HttpExchange;
 import lombok.Getter;
 
 /**
- * 
+ * Http 요청 처리 핸들러 클래스
  * 
  * @author jmsohn
  */
@@ -22,29 +22,41 @@ public class HandlerDTO {
 	
 	
 	/**
+	 * 요청 처리 핸들러 메소드 타입
 	 * 
+	 * @author jmsohn
 	 */
 	private enum MethodType {
+		
+		/** 파라미터 없는 타입 */
 		NON_PARAM,
+		
+		/** 파라미터가 Http 요청/응답 객체만 있는 타입 */
 		EXCHANGE_PARAM_ONLY,
+		
+		/** 파라미터가 패스 변수 목록만 있는 타입 */
 		PATHLIST_PARAM_ONLY,
+		
+		/** 파라미터가 Http 요청/응답 객체, 패스 변수 목록 순으로 있는 타입 */
 		EXCHANGE_PATHLIST_PARAM,
+		
+		/** 파라미터가 패스 변수 목록, Http 요청/응답 객체 순으로 있는 타입 */
 		PATHLIST_EXCHANGE_PARAM;
 	}
 	
 	
-	/** */
+	/** 패스 패턴 */
 	@Getter
 	private final StringUtil.WildcardPattern pathPattern;
 	
-	/** */
+	/** Http 메소드 종류 */
 	@Getter
 	private final Set<HttpMethod> httpMethodSet;
 	
-	/** */
+	/** 요청 처리 핸들러 메소드 타입 */
 	private final MethodType methodType;
 	
-	/** */
+	/** 요청 처리 핸들러 메소드 */
 	@Getter
 	private final Method method;
 	
