@@ -1,5 +1,6 @@
 package com.redeye.kafexporter.util;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +138,15 @@ public class JSONUtil {
 		} else {
 			
 			if(TypeUtil.isPrimitive(type) == true) {
-				return obj.toString();
+				
+				String value = obj.toString();
+				
+				if(value.equals("NaN") == true) {	// Not a Number 처리
+					return "null";
+				} else {
+					return value;
+				}
+				
 			} else {
 				return '"' + obj.toString() + '"';
 			}
