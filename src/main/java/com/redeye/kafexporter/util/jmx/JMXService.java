@@ -17,7 +17,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import com.epozen.emma.exporter.kafka.util.StringUtil;
+import com.redeye.kafexporter.util.StringUtil;
 
 import lombok.Getter;
 
