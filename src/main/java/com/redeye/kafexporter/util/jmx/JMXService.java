@@ -9,13 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import com.redeye.kafexporter.util.StringUtil;
+import com.epozen.emma.exporter.kafka.util.StringUtil;
 
 import lombok.Getter;
 
@@ -44,7 +46,7 @@ public class JMXService implements Closeable {
 	
 	/** 연결 종료 여부 */
 	@Getter
-	private volatile boolean closed;
+	private volatile boolean isClosed;
 	
 
 	/**
@@ -75,7 +77,7 @@ public class JMXService implements Closeable {
 
 		// Connector 생성
 		this.jmxConnector = JMXConnectorFactory.connect(jmxUrl, env);
-		this.closed = false;
+		this.isClosed = false;
 	}
 	
 	/**
@@ -93,7 +95,7 @@ public class JMXService implements Closeable {
 	 */
 	public JMXService() {
 		this.connType = JMXConnectionType.INTERNAL;
-		this.closed = false;
+		this.isClosed = false;
 	}
 	
 	/**
@@ -135,22 +137,48 @@ public class JMXService implements Closeable {
 		}
 		
 		// 검색 수행
-        ObjectName query = new ObjectName(namePatternStr);
-        Set<ObjectName> mbeans = this.getMBeanConnection().queryNames(query, null);
-        
-        // Object Name 목록 생성 및 반환
-        List<String> nameList = new ArrayList<String>();
-        for(ObjectName mbean : mbeans) {
-        	nameList.add(mbean.getCanonicalName());
-        }
-        
-        return nameList;
+		ObjectName query = new ObjectName(namePatternStr);
+		Set<ObjectName> mbeans = this.getMBeanConnection().queryNames(query, null);
+
+		// Object Name 목록 생성 및 반환
+		List<String> nameList = new ArrayList<String>();
+		for(ObjectName mbean : mbeans) {
+			nameList.add(mbean.getCanonicalName());
+		}
+
+		return nameList;
+	}
+	
+	/**
+	 * JMX 객체의 속성 명 목록 반환
+	 * 
+	 * @param objectName ObjectName 객체
+	 * @return JMX 객체의 속성 명 목록
+	 */
+	public List<String> getAttrNameList(ObjectName objectName) throws Exception {
+		
+		// 입력값 검증
+		if(objectName == null) {
+			throw new IllegalArgumentException("'objectName' is null or blank.");
+		}
+		
+		// ObjectName 객체에서 MBean 정보 추출
+		MBeanInfo mbean = this.getMBeanConnection().getMBeanInfo(objectName);
+		
+		// 속성명 목록 변수
+		List<String> attrNameList = new ArrayList<>();
+		
+		for(MBeanAttributeInfo attr : mbean.getAttributes()) {
+			attrNameList.add(attr.getName());
+		}
+		
+		return attrNameList;
 	}
 
 	/**
 	 * JMX 객체의 속성 값 반환 
 	 * 
-	 * @param objectNameStr 객체 명
+	 * @param objectNameStr ObjectName 객체 명
 	 * @param attrNameStr 속성 명
 	 * @return 속성 값
 	 */
@@ -161,15 +189,34 @@ public class JMXService implements Closeable {
 			throw new IllegalArgumentException("'objectNameStr' is null or blank.");
 		}
 		
+		// JMX 값 획득 및 반환
+		return this.get(new ObjectName(objectNameStr), attrNameStr);
+	}
+
+	/**
+	 * JMX 객체의 속성 값 반환
+	 * 
+	 * @param objectName ObjectName 객체
+	 * @param attrNameStr 속성 명
+	 * @return 속성 값
+	 */
+	public Object get(ObjectName objectName, String attrNameStr) throws Exception {
+		
+		// 입력 값 검증
+		if(objectName == null) {
+			throw new IllegalArgumentException("'objectName' is null.");
+		}
+		
 		if(StringUtil.isBlank(attrNameStr) == true) {
 			throw new IllegalArgumentException("'attrNameStr' is null or blank.");
 		}
 
-		// ObjectName 설정
-		ObjectName objectName = new ObjectName(objectNameStr);
-
 		// JMX 값 획득 및 반환
-		return this.getMBeanConnection().getAttribute(objectName, attrNameStr);
+		try {
+			return this.getMBeanConnection().getAttribute(objectName, attrNameStr);
+		} catch(Exception ex) {
+			return "";
+		}
 	}
 	
 	/**
@@ -207,24 +254,40 @@ public class JMXService implements Closeable {
 			throw new IllegalArgumentException("'query' is null or blank.");
 		}
 		
-		if(attrNameAry == null || attrNameAry.length == 0) {
-			throw new IllegalArgumentException("'attrNameAry' is null or length is 0.");
+		// 속성 명 목록이 정의되어 있는지 여부 변수
+		boolean isAttrNameDefined = false;
+		
+		// 속성 명 목록 변수
+		List<String> attrNameList = null;
+		
+		if(attrNameAry != null && attrNameAry.length != 0) {
+			attrNameList = List.of(attrNameAry);
+			isAttrNameDefined = true;	// 속성 명 목록 변수가 설정되어 있음
 		}
 		
 		// ObjectName 맵 변수
 		Map<String, Map<String, Object>> nameAttrMap = new HashMap<>();
 		
-		List<String> nameList = this.findObjectName(query);
-		for(String name: nameList) {
+		// 쿼리 실행 및 ObjectName 목록 획득
+		Set<ObjectName> objectNameList = this.getMBeanConnection().queryNames(new ObjectName(query), null);
+		
+		// mbean 별로 속성 설정
+		for(ObjectName objectName: objectNameList) {
+			
+			// 속성 명 목록 변수(attrNameAry)가 설정되어 있지 않으면,
+			// mbean의 모든 속성을 반환하도록 설정함
+			if(isAttrNameDefined == false) {
+				attrNameList = this.getAttrNameList(objectName);
+			}
 			
 			// 속성 명 - 값 맵 객체 생성
 			Map<String, Object> attrMap = new HashMap<>();
-			for(String attrName: attrNameAry) {
-				attrMap.put(attrName, this.get(name, attrName));
+			for(String attrName: attrNameList) {
+				attrMap.put(attrName, this.get(objectName, attrName));
 			}
 			
 			// ObjectName 맵에 추가
-			nameAttrMap.put(name, attrMap);
+			nameAttrMap.put(objectName.getCanonicalName(), attrMap);
 		}
 		
 		return nameAttrMap;
@@ -234,7 +297,7 @@ public class JMXService implements Closeable {
 	public synchronized void close() throws IOException {
 		
 		// 이미 닫힌 경우는 반환
-		if(this.closed == true) {
+		if(this.isClosed == true) {
 			return;
 		}
 		
@@ -247,7 +310,8 @@ public class JMXService implements Closeable {
 			return;
 		}
 		
+		// 클로즈 수행
 		this.jmxConnector.close();
-		this.closed = true;
+		this.isClosed = true;
 	}
 }
