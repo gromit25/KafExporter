@@ -68,6 +68,7 @@ public class KafkaTransformer {
 		
 		// 초기화
 		KafkaConsumerPollAdvice.init(KafkaAcquisitor.pollTimeQueue);
+		KafkaConsumerCommitSyncAdvice.init(null);
 
 		// KafkaConsumer의 생성자 호출 어드바이스 설정
 		new AgentBuilder.Default()

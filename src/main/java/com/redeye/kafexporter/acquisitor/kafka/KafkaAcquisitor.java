@@ -40,6 +40,7 @@ public class KafkaAcquisitor {
 	/** (key: 클라이언트 아이디, value: 마지막 poll 호출 시간) */
 	private static final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
 	
+	
 	/** Kafka JMX 데이터 수집 객체 */
 	private static final JMXService svc = new JMXService();
 	
