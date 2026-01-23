@@ -15,7 +15,7 @@ import com.sun.net.httpserver.HttpHandler;
 import lombok.Getter;
 
 /**
- * 
+ * 컨트롤러 컨텍스트 클래스
  * 
  * @author jmsohn
  */
@@ -23,19 +23,21 @@ import lombok.Getter;
 class ControllerContext implements HttpHandler {
 	
 	
-	/** */
+	/** 컨트롤러 객체 */
 	private final Object controller;
 
-	/** */
+	/** 컨트롤러 기본 패스 */
 	@Getter
 	private final String basePath;
 	
-	/** */
+	/** 요청 핸들러 목록 */
 	private final List<HandlerDTO> handlerList = new CopyOnWriteArrayList<>();
 
 	
 	/**
 	 * 생성자
+	 * 
+	 * @param controller 컨트롤러 객체
 	 */
 	public ControllerContext(Object controller) throws Exception {
 		
@@ -44,6 +46,7 @@ class ControllerContext implements HttpHandler {
 			throw new IllegalArgumentException("'controller' is null.");
 		}
 		
+		// 컨트롤러 여부 확인 및 설정
 		Controller controllerAnnotation = controller.getClass().getAnnotation(Controller.class);
 		if(controllerAnnotation == null) {
 			throw new IllegalArgumentException("Controller Annotation not found: " + controller.getClass());
@@ -57,6 +60,7 @@ class ControllerContext implements HttpHandler {
 		// 컨트롤러의 각 핸들러 메소드 초기화
 		for(Method method: this.controller.getClass().getDeclaredMethods()) {
 			
+			// 요청 핸들러 여부 확인 및 설정
 			RequestHandler handlerAnnotation = method.getAnnotation(RequestHandler.class);
 			if(handlerAnnotation == null) {
 				continue;
@@ -68,7 +72,7 @@ class ControllerContext implements HttpHandler {
 				path = "/" + path;
 			}
 			
-			// 핸들러 등록
+			// 요청 핸들러 등록
 			this.handlerList.add(
 				new HandlerDTO(
 					this.basePath + path,
@@ -88,10 +92,23 @@ class ControllerContext implements HttpHandler {
 			HandlerDTO handler = this.getMatchedHandler(exchange);
 			
 			// 핸들러 메소드 호출
-			String response = handler.invoke(controller, exchange);
+			String response = null;
+			int code = 200;
 			
-			// 응답 헤더 설정 (상태 코드 200, 본문 길이)
-			exchange.sendResponseHeaders(200, response.length());
+			try {
+				
+				response = handler.invoke(controller, exchange);
+				
+			} catch(Exception ex) {
+				
+				code = 500;
+				response = "Internal Server Error.";
+				
+				ex.printStackTrace();
+			}
+			
+			// 응답 헤더 설정 (상태 코드, 본문 길이)
+			exchange.sendResponseHeaders(code, response.length());
 			
 			// 응답 본문 전송
 			try(OutputStream os = exchange.getResponseBody()) {
@@ -138,7 +155,7 @@ class ControllerContext implements HttpHandler {
 	}
 	
 	/**
-	 * 
+	 * 요청 처리 핸들러를 찾지 못했을 경우 발생하는 예외 클래스
 	 * 
 	 * @author jmsohn
 	 */
@@ -148,9 +165,9 @@ class ControllerContext implements HttpHandler {
 		private static final long serialVersionUID = -3843908037266338263L;
 		
 		/**
+		 * 생성자
 		 * 
-		 * 
-		 * @param message
+		 * @param message 예외 메시지
 		 */
 		public NotFoundException(String message) {
 			super(message);
