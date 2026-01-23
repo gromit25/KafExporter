@@ -10,7 +10,7 @@ import com.sun.net.httpserver.HttpServer;
 import lombok.Getter;
 
 /**
- * 
+ * Http 서비스 클래스
  * 
  * @author jmsohn
  */
@@ -21,15 +21,15 @@ public class HttpService {
 	/** Http 서버 */
 	private HttpServer server;
 	
-	/** */
+	/** Http 서버명 */
 	@Getter
 	private String hostName;
 	
-	/** */
+	/** 포트 번호 */
 	@Getter
 	private int port;
 	
-	/** */
+	/** 컨트롤러 목록 */
 	private final List<ControllerContext> controllerList = new CopyOnWriteArrayList<>();
 	
 	
@@ -61,48 +61,54 @@ public class HttpService {
 	}
 	
 	/**
+	 * 컨트롤러 목록 추가
 	 * 
-	 * 
-	 * @param controller
+	 * @param controller 추가할 컨트롤러
 	 * @return 현재 객체
 	 */
 	public HttpService addController(Object controller) throws Exception {
 		
+		// 컨트롤러 목록 추가
 		this.controllerList.add(new ControllerContext(controller));
+		
 		return this;
 	}
 	
 	/**
-	 * 
+	 * Http 서버 시작
 	 * 
 	 * @return 현재 객체
 	 */
 	public HttpService start() {
 		
+		// Http 서버에 컨트롤러 등록
 		for(ControllerContext controller: this.controllerList) {
 			this.server.createContext(controller.getBasePath(), controller);
 		}
 		
+		// Http 서버 시작
 		this.server.start();
 		
 		return this;
 	}
 	
 	/**
-	 * 
+	 * Http 서버 중지
 	 * 
 	 * @return 현재 객체
 	 */
 	public HttpService stop() {
 		
+		// Http 서버 중지
 		this.server.stop(1000);
 		
 		return this;
 	}
 	
 	/**
+	 * Http 서버 호스트명:포트번호 반환
 	 * 
-	 * @return
+	 * @return Http 서버 호스트명:포트번호
 	 */
 	public String getHostStr() {
 		return this.getHostName() + ":" + this.getPort();
