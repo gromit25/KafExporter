@@ -2,9 +2,11 @@ package com.redeye.kafexporter.util.http.service.model;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.util.http.service.HttpMethod;
@@ -44,10 +46,12 @@ public class HandlerDTO {
 		PATHLIST_EXCHANGE_PARAM;
 	}
 	
+	/** 패스 패턴 원본 문자열 */
+	private final String pathPatternStr;
 	
-	/** 패스 패턴 */
+	/** 패스 패턴 목록 */
 	@Getter
-	private final StringUtil.WildcardPattern pathPattern;
+	private final List<StringUtil.WildcardPattern> pathSegmentPatternList = new CopyOnWriteArrayList<>();
 	
 	/** Http 메소드 종류 */
 	@Getter
@@ -64,15 +68,28 @@ public class HandlerDTO {
 	/**
 	 * 생성자
 	 * 
-	 * @param path
+	 * @param path 패스 패턴 - 전체 경로
 	 * @param methodList
 	 * @param method
 	 */
 	public HandlerDTO(String path, HttpMethod[] httpMethodList, Method method) throws Exception {
 		
-		// 1. Path 설정
-		this.pathPattern = StringUtil.WildcardPattern.create(path);
+		// 0. 패스 패턴 저장
+		this.pathPatternStr = path;
 		
+		// 1. 패스 세그먼트 패턴 목록 설정
+		String[] pathSegmentAry = path.split("/");
+		
+		for(String pathSegment: pathSegmentAry) {
+			
+			// 패스 이름이 없는 경우 스킵
+			if(StringUtil.isBlank(pathSegment) == true) {
+				continue;
+			}
+			
+			this.pathSegmentPatternList.add(StringUtil.WildcardPattern.create(pathSegment));
+		}
+				
 		// 2. HTTP 메소드 설정
 		this.httpMethodSet = new HashSet<>();
 		for(HttpMethod httpMethod: httpMethodList) {
@@ -151,17 +168,32 @@ public class HandlerDTO {
 			return false;
 		}
 		
-		// path 매칭 여부 검사
+		// 1. 패스 매칭 여부 검사
 		String path = exchange.getRequestURI().getPath();
+		String[] pathSegmentAry = path.split("/");
 		
-		StringUtil.WildcardMatcher pathMatcher = this.pathPattern.match(path);
-		if(pathMatcher.isMatch() == false) {
+		// 입력된 패스 세그먼트의 수와 패치할 패스 세그먼트 패턴의 개수가 일치하지 않으면 false 반환
+		if(pathSegmentAry.length != this.pathSegmentPatternList.size()) {
 			return false;
 		}
 		
-		// HTTP METHOD 매칭 여부 검사
+		// 각 패스 세그먼트의 패턴 일치 여부 검사
+		// 하나라도 일치하지 않으면 false 반환
+		for(int index = 0; index < pathSegmentAry.length; index++) {
+			
+			StringUtil.WildcardMatcher pathMatcher = this.pathSegmentPatternList
+				.get(index)
+				.match(pathSegmentAry[index]);
+			
+			if(pathMatcher.isMatch() == false) {
+				return false;
+			}
+		}
+		
+		// 2. HTTP 메소드 매칭 여부 검사
 		String httpMethodName = exchange.getRequestMethod();
 		
+		// 처리 가능한 HTTP 메소드 중 하나라도 일치하면 true 반환
 		for(HttpMethod httpMethod: this.httpMethodSet) {
 			if(httpMethod.name().equals(httpMethodName) == true) {
 				return true;
@@ -184,9 +216,29 @@ public class HandlerDTO {
 		Object retrival = null;
 		
 		//
-		String path = exchange.getRequestURI().getPath();
-		List<String> pathList = this.pathPattern.match(path).getGroups();
+		List<String> pathParamList = new ArrayList<>();
 		
+		String path = exchange.getRequestURI().getPath();
+		String[] pathSegmentAry = path.split("/");
+		
+		if(pathSegmentAry.length != this.pathSegmentPatternList.size()) {
+			throw new RuntimeException("unmatched path exception: " + path);
+		}
+		
+		for(int index = 0; index < pathSegmentAry.length; index++) {
+			
+			StringUtil.WildcardMatcher pathMatcher = this.pathSegmentPatternList
+				.get(index)
+				.match(pathSegmentAry[index]);
+			
+			if(pathMatcher.isMatch() == false) {
+				throw new RuntimeException("unmatched path exceptiuon: " + path);
+			}
+			
+			pathParamList.addAll(pathMatcher.getGroups());
+		}
+		
+		//
 		switch(this.methodType) {
 		case NON_PARAM:
 			retrival = this.method.invoke(obj);
@@ -197,15 +249,15 @@ public class HandlerDTO {
 			break;
 			
 		case PATHLIST_PARAM_ONLY:
-			retrival = this.method.invoke(obj, pathList);
+			retrival = this.method.invoke(obj, pathParamList);
 			break;
 			
 		case EXCHANGE_PATHLIST_PARAM:
-			retrival = this.method.invoke(obj, exchange, pathList);
+			retrival = this.method.invoke(obj, exchange, pathParamList);
 			break;
 			
 		case PATHLIST_EXCHANGE_PARAM:
-			retrival = this.method.invoke(obj, pathList, exchange);
+			retrival = this.method.invoke(obj, pathParamList, exchange);
 			break;
 			
 		default:
