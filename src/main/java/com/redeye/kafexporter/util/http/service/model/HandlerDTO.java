@@ -46,7 +46,9 @@ public class HandlerDTO {
 		PATHLIST_EXCHANGE_PARAM;
 	}
 	
+	
 	/** 패스 패턴 원본 문자열 */
+	@Getter
 	private final String pathPatternStr;
 	
 	/** 패스 패턴 목록 */
@@ -102,10 +104,10 @@ public class HandlerDTO {
 	}
 	
 	/**
+	 * 주어진 메소드의 메소드 타입 반환
 	 * 
-	 * 
-	 * @param method
-	 * @return
+	 * @param method 메소드 타입을 검사할 메소드
+	 * @return 메소드 타입
 	 */
 	private static MethodType getMethodType(Method method) {
 		
@@ -149,17 +151,17 @@ public class HandlerDTO {
 			}
 			
 		} else {
-			throw new RuntimeException(method +  " must have 0, 1, 2 params.");
+			throw new RuntimeException(method +  " must have 0, 1, 2 params: " + parameterTypes.length);
 		}
 
 		return methodType;
     }
 
 	/**
+	 * Http 요청이 핸들러가 처리할 수 있는 요청인지 여부 반환
 	 * 
-	 * 
-	 * @param exchange
-	 * @return
+	 * @param exchange Http 요청/응답 객체
+	 * @return 요청 처리 가능 여부
 	 */
 	public boolean isMatched(HttpExchange exchange) {
 		
@@ -204,25 +206,26 @@ public class HandlerDTO {
 	}
 	
 	/**
+	 * Http 요청을 처리하기 위해 핸들러 메소드를 호출
 	 * 
-	 * 
-	 * @param obj
-	 * @param exchange
-	 * @return
+	 * @param obj 요청 처리 객체
+	 * @param exchange Http 요청/응답 객체
+	 * @return 처리 결과 메시지
 	 */
 	public String invoke(Object obj, HttpExchange exchange) throws Exception {
 		
-		//
+		// 요청 처리 후 응답 변수
 		Object retrival = null;
 		
-		//
+		// 패스의 변수 값 목록 변수
 		List<String> pathParamList = new ArrayList<>();
 		
+		// Http 요청 패스에서 변수 목록 추출
 		String path = exchange.getRequestURI().getPath();
 		String[] pathSegmentAry = path.split("/");
 		
 		if(pathSegmentAry.length != this.pathSegmentPatternList.size()) {
-			throw new RuntimeException("unmatched path exception: " + path);
+			throw new RuntimeException("unmatched path exception: " + path + ", " + this.pathPatternStr);
 		}
 		
 		for(int index = 0; index < pathSegmentAry.length; index++) {
@@ -232,13 +235,13 @@ public class HandlerDTO {
 				.match(pathSegmentAry[index]);
 			
 			if(pathMatcher.isMatch() == false) {
-				throw new RuntimeException("unmatched path exceptiuon: " + path);
+				throw new RuntimeException("unmatched path exceptiuon: " + path + ", " + this.pathPatternStr);
 			}
 			
 			pathParamList.addAll(pathMatcher.getGroups());
 		}
 		
-		//
+		// 메소드의 타입에 따라 요청 처리 핸들러 메소드를 호출
 		switch(this.methodType) {
 		case NON_PARAM:
 			retrival = this.method.invoke(obj);
@@ -264,7 +267,7 @@ public class HandlerDTO {
 			throw new RuntimeException("unexpected type: " + this.methodType);
 		}
 		
-		//
+		// 요청 처리 결과 반환
 		return (retrival != null)?retrival.toString():"";
 	}
 }
