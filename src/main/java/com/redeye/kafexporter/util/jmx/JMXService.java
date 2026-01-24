@@ -33,7 +33,11 @@ public class JMXService implements Closeable {
 	 * JMX 연결 타입 enum
 	 */
 	private enum JMXConnectionType {
+		
+		/** 현재 JVM에 접속 */
 		INTERNAL,
+		
+		/** 원격 JVM에 접속 */
 		EXTERNAL
 	}
 	
