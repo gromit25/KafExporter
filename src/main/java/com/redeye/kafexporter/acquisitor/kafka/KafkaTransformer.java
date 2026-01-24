@@ -67,8 +67,9 @@ public class KafkaTransformer {
 		// --- KafkaConsumer 메소드 훅킹 설정
 		
 		// 초기화
-		KafkaConsumerPollAdvice.init(KafkaAcquisitor.pollTimeQueue);
-		KafkaConsumerCommitSyncAdvice.init(null);
+		KafkaConsumerPollAdvice.init(KafkaAcquisitor.poolTimeStatDaemon);
+		KafkaConsumerCommitSyncAdvice.init(KafkaAcquisitor.commitSyncTimeStatDaemon);
+		KafkaConsumerCommitAsyncAdvice.init(KafkaAcquisitor.commitAsyncTimeStatDaemon);
 
 		// KafkaConsumer의 생성자 호출 어드바이스 설정
 		new AgentBuilder.Default()

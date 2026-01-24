@@ -3,6 +3,7 @@ package com.redeye.kafexporter.acquisitor.kafka.advice;
 import java.util.concurrent.BlockingQueue;
 
 import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
+import com.redeye.kafexporter.acquisitor.kafka.stat.TimeStatDaemon;
 
 /**
  * 
@@ -21,8 +22,8 @@ public class ClientTimeAdvice {
 	 *
 	 * @param queue
 	 */
-	public static void init(BlockingQueue<ClientTimeDTO> queue) {
-		ClientTimeAdvice.queue = queue;
+	public static void init(TimeStatDaemon timeStatDaemon) {
+		ClientTimeAdvice.queue = timeStatDaemon.getQueue();
 	}
 	
 	/**

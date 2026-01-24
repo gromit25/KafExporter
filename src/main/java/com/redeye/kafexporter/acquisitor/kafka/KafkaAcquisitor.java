@@ -3,15 +3,11 @@ package com.redeye.kafexporter.acquisitor.kafka;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
+import com.redeye.kafexporter.acquisitor.kafka.stat.TimeStatDaemon;
 import com.redeye.kafexporter.util.StringUtil;
-import com.redeye.kafexporter.util.daemon.QueueDaemon;
 import com.redeye.kafexporter.util.jmx.JMXService;
-import com.redeye.kafexporter.util.stat.Parameter;
 
 /**
  * Kafka 정보 수집기
@@ -27,19 +23,16 @@ public class KafkaAcquisitor {
 	/** 컨슈머 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
 	static final Map<String, Map<String, Object>> consumerConfigMap = new ConcurrentHashMap<>();
 
-	/** polling 시간 수집 큐 */
-	static final BlockingQueue<ClientTimeDTO> pollTimeQueue = new LinkedBlockingQueue<>();
- 
 	
-	/** */
-	private static QueueDaemon<ClientTimeDTO> pollTimeDaemon = null;
+	/** 폴링 시간 통계 데몬 */
+	final static TimeStatDaemon poolTimeStatDaemon = new TimeStatDaemon();
 	
-	/** */
-	private static final Map<String, Parameter> pollTimeStatMap = new ConcurrentHashMap<>();
+	/** 동기 커밋 시간 통계 데몬 */
+	final static TimeStatDaemon commitSyncTimeStatDaemon = new TimeStatDaemon();
 	
-	/** (key: 클라이언트 아이디, value: 마지막 poll 호출 시간) */
-	private static final Map<String, Long> pollTimeMap = new ConcurrentHashMap<>();
-	
+	/** 비동기 시간 통계 데몬 */
+	final static TimeStatDaemon commitAsyncTimeStatDaemon = new TimeStatDaemon();
+
 	
 	/** Kafka JMX 데이터 수집 객체 */
 	private static final JMXService svc = new JMXService();
@@ -49,33 +42,11 @@ public class KafkaAcquisitor {
 	 * 초기화
 	 */
 	public static void init() {
-
-		//
-		pollTimeDaemon = new QueueDaemon<>(
-			pollTimeQueue,
-			data -> {
-				
-				// 기존 값 저장 
-				Long prePollTime = pollTimeMap.get(data.getClientId());
-				
-				// 폴링 시간 저장
-				pollTimeMap.put(data.getClientId(), data.getTime());
-				
-				// 통계 정보 저장
-				Parameter pollTimeStat = pollTimeStatMap.computeIfAbsent(
-					data.getClientId(), key -> new Parameter()
-				);
-				
-				if(prePollTime != null) {
-					long interval = data.getTime() - prePollTime;
-					pollTimeStat.add(interval);
-				}
-				
-				System.out.println("### STAT : \n" + pollTimeStat);
-			}
-		);
 		
-		pollTimeDaemon.run();
+		//
+		poolTimeStatDaemon.start();
+		commitSyncTimeStatDaemon.start();
+		commitAsyncTimeStatDaemon.start();
 	}
 	
 	/**
