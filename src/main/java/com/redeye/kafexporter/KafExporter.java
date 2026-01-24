@@ -4,9 +4,12 @@ import java.lang.instrument.Instrumentation;
 
 import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
 import com.redeye.kafexporter.acquisitor.kafka.KafkaTransformer;
-import com.redeye.kafexporter.exporter.http.HttpExporter;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaClientController;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaConfigController;
+import com.redeye.kafexporter.exporter.http.kafka.KafkaMetricsController;
 import com.redeye.kafexporter.util.StringUtil;
 import com.redeye.kafexporter.util.WebUtil;
+import com.redeye.kafexporter.util.http.service.HttpService;
 
 /**
  * kafka 정보 수집기 클래스
@@ -14,6 +17,11 @@ import com.redeye.kafexporter.util.WebUtil;
  * @author jmsohn
  */
 public class KafExporter {
+	
+	
+	/** http exporter 서비스*/
+	private static HttpService service;
+	
 	
 	/**
 	 * 메인 메소드
@@ -31,43 +39,58 @@ public class KafExporter {
 			// ----- kafka 정보 수집기 초기화
 			KafkaAcquisitor.init();
 			
-			// ----- exporter 서버 기동
-			
-			// export 서버명
-			String host = "localhost";
-			
-			// export 서버 포트 
-			int port = 0; // 설정 값이 없는 경우, 서버에서 비어 있는 랜덤 포트를 사용
-			
-			// exporter 호스트 및 포트 번호 획득
-			if(StringUtil.isBlank(args) == false) {
-
-				if(args.matches("[0-9]+") == true) {
-					port = Integer.parseInt(args);
-				} else {
-					
-					String[] hostPort = WebUtil.parseHostPort(args);
-					
-					host = hostPort[0];
-					port = Integer.parseInt(hostPort[1]);
-				}
-			}
-			
-			// exporter 서버의 스레드 개수 설정
-			int threadCount = Integer
-				.parseInt(
-					getEnv("AGENT_EXPORTER_THREAD_COUNT", "-1")
-				);
-
-			// exporter 서버 기동
-			HttpExporter exporterServer = new HttpExporter(host, port, threadCount);
-			exporterServer.start();
-			
-			System.out.println("exporter server(" + exporterServer.getHostStr() + ") is started.");
+			// ----- exporter 서비스 기동
+			startHttpExporterService(args);
+			System.out.println("http exporter server(" + service.getHostStr() + ") is started.");
 			
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	/**
+	 * http exporter 서비스 기동
+	 * 
+	 * @param hostPortArgs 
+	 */
+	private static void startHttpExporterService(String hostPortArgs) throws Exception {
+		
+		// export 서버명
+		String host = "localhost";
+		
+		// export 서버 포트 
+		int port = 0; // 설정 값이 없는 경우, 서버에서 비어 있는 랜덤 포트를 사용
+		
+		// exporter 호스트 및 포트 번호 획득
+		if(StringUtil.isBlank(hostPortArgs) == false) {
+
+			if(hostPortArgs.matches("[0-9]+") == true) {
+				port = Integer.parseInt(hostPortArgs);
+			} else {
+				
+				String[] hostPort = WebUtil.parseHostPort(hostPortArgs);
+				
+				host = hostPort[0];
+				port = Integer.parseInt(hostPort[1]);
+			}
+		}
+		
+		// exporter 서버의 스레드 개수 설정
+		int threadCount = Integer
+			.parseInt(
+				getEnv("AGENT_EXPORTER_THREAD_COUNT", "-1")
+			);
+		
+		// Http 서버 생성
+		service = new HttpService(host, port, threadCount);
+		
+		// kafka 컨트롤러 추가
+		service.addController(new KafkaClientController());
+		service.addController(new KafkaConfigController());
+		service.addController(new KafkaMetricsController());
+		
+		// Http 서버 기동
+		service.start();
 	}
 	
 	/**
