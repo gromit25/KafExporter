@@ -33,13 +33,13 @@ public class KafExporter {
 		
 		try {
 
-			// ----- kafka 메소드 변환 클래스
+			// kafka 메소드 변환
 			KafkaTransformer.addKafkaTransformer(inst);
 			
-			// ----- kafka 정보 수집기 초기화
+			// kafka 정보 수집기 초기화
 			KafkaAcquisitor.init();
 			
-			// ----- exporter 서비스 기동
+			// exporter 서비스 기동
 			startHttpExporterService(args);
 			System.out.println("http exporter server(" + service.getHostStr() + ") is started.");
 			
@@ -55,17 +55,20 @@ public class KafExporter {
 	 */
 	private static void startHttpExporterService(String hostPortArgs) throws Exception {
 		
-		// export 서버명
+		// export 서버명 변수
 		String host = "localhost";
 		
-		// export 서버 포트 
+		// export 서버 포트 변수
 		int port = 0; // 설정 값이 없는 경우, 서버에서 비어 있는 랜덤 포트를 사용
 		
 		// exporter 호스트 및 포트 번호 획득
+		// 없을 경우 기본 설정 값 사용
 		if(StringUtil.isBlank(hostPortArgs) == false) {
 
 			if(hostPortArgs.matches("[0-9]+") == true) {
+				
 				port = Integer.parseInt(hostPortArgs);
+				
 			} else {
 				
 				String[] hostPort = WebUtil.parseHostPort(hostPortArgs);
@@ -80,6 +83,8 @@ public class KafExporter {
 			.parseInt(
 				getEnv("AGENT_EXPORTER_THREAD_COUNT", "-1")
 			);
+		
+		// -----------------------------
 		
 		// Http 서버 생성
 		service = new HttpService(host, port, threadCount);

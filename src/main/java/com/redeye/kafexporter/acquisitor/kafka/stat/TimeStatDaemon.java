@@ -19,68 +19,68 @@ import lombok.Getter;
 public class TimeStatDaemon {
 	
 	
-	/** */
-	private QueueDaemon<ClientTimeDTO> timeDaemon = null;
-	
-	/** */
+	/** 클라이언트 아이디별 최종 시간 데이터 - key: 클라이언트 아이디, value: 시간 데이터 */
 	private final Map<String, Long> clientTimeMap = new ConcurrentHashMap<>();
 	
-	/** */
+	/** 클라이언트 아이디별 시간 통계 데이터 - key: 클라이언트 아이디, value: 시간 통계 데이터 */
 	private final Map<String, Parameter> clientTimeStatMap = new ConcurrentHashMap<>();
 
-	/** polling 시간 수집 큐 */
+	/** 시간 수집 큐 - 클라이언트 별 시간 데이터를 수신하는 큐 */
 	@Getter
 	private final BlockingQueue<ClientTimeDTO> queue = new LinkedBlockingQueue<>();
 
+	/** 통계 생성 데몬 - 시간 수집 큐에서 데이터를 받아 통계 데이터를 생성하는 데몬 */
+	private QueueDaemon<ClientTimeDTO> timeStatDaemon = null;
+	
 	
 	/**
-	 * 
+	 * 생성자
 	 */
 	public TimeStatDaemon() {
 		
-		//
-		this.timeDaemon = new QueueDaemon<>(
+		// 통계 생성 데몬 생성
+		this.timeStatDaemon = new QueueDaemon<>(
 			this.queue,
 			data -> {
 				
 				// 기존 값 저장 
 				Long prePollTime = clientTimeMap.get(data.getClientId());
 				
-				// 폴링 시간 저장
+				// 시간 저장
 				clientTimeMap.put(data.getClientId(), data.getTime());
 				
 				// 통계 정보 저장
-				Parameter pollTimeStat = clientTimeStatMap.computeIfAbsent(
+				Parameter timeStat = clientTimeStatMap.computeIfAbsent(
 					data.getClientId(), key -> new Parameter()
 				);
 				
 				if(prePollTime != null) {
 					long interval = data.getTime() - prePollTime;
-					pollTimeStat.add(interval);
+					timeStat.add(interval);
 				}
 				
-				System.out.println("### STAT : \n" + pollTimeStat);
+				System.out.println("### STAT : \n" + timeStat);
 			}
 		);
 	}
 	
 	/**
+	 * 통계 생성 데몬 기동
 	 * 
-	 * 
-	 * @return
+	 * @return 현재 객체
 	 */
 	public TimeStatDaemon start() {
-		this.timeDaemon.run();
+		this.timeStatDaemon.run();
 		return this;
 	}
 	
 	/**
+	 * 통계 생성 데몬 중지
 	 * 
-	 * 
-	 * @return
+	 * @return 현재 객체
 	 */
 	public TimeStatDaemon stop() {
-		this.timeDaemon.stop();
+		this.timeStatDaemon.stop();
 		return this;
 	}
 }
