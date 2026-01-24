@@ -12,7 +12,7 @@ import com.redeye.kafexporter.util.stat.Parameter;
 import lombok.Getter;
 
 /**
- * 
+ * 시간 통계 데몬 클래스
  * 
  * @author jmsohn
  */
