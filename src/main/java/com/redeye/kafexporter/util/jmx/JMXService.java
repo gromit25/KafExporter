@@ -200,7 +200,7 @@ public class JMXService implements Closeable {
 	 * @param attrNameStr 속성 명
 	 * @return 속성 값
 	 */
-	public Object get(ObjectName objectName, String attrNameStr) throws Exception {
+	public Object get(ObjectName objectName, String attrNameStr) {
 		
 		// 입력 값 검증
 		if(objectName == null) {
