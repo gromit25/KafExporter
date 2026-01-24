@@ -65,25 +65,6 @@ public class TimeStatDaemon {
 	}
 	
 	/**
-	 * 통계정보 맵 반환
-	 * 
-	 * @return 통계정보 맵
-	 */
-	public Map<String, Parameter> getStat() {
-		return this.clientTimeStatMap;
-	}
-	
-	/**
-	 * 클라이언트 아이디의 통계정보 반환
-	 * 
-	 * @param clientId 클라이언트 아이디
-	 * @return 통계 정보
-	 */
-	public Parameter getStat(String clientId) {
-		return this.getStat().get(clientId);
-	}
-	
-	/**
 	 * 통계 생성 데몬 기동
 	 * 
 	 * @return 현재 객체
@@ -101,5 +82,24 @@ public class TimeStatDaemon {
 	public TimeStatDaemon stop() {
 		this.timeStatDaemon.stop();
 		return this;
+	}
+	
+	/**
+	 * 통계정보 맵 반환
+	 * 
+	 * @return 통계정보 맵
+	 */
+	public Map<String, Parameter> getStat() {
+		return this.clientTimeStatMap;
+	}
+	
+	/**
+	 * 클라이언트 아이디의 통계정보 반환
+	 * 
+	 * @param clientId 클라이언트 아이디
+	 * @return 통계 정보
+	 */
+	public Parameter getStat(String clientId) {
+		return this.getStat().get(clientId);
 	}
 }
