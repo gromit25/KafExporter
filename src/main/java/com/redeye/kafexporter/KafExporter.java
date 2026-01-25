@@ -51,7 +51,7 @@ public class KafExporter {
 	/**
 	 * http exporter 서비스 기동
 	 * 
-	 * @param hostPortArgs 
+	 * @param hostPortArgs 기동할 호스트:포트 문자열
 	 */
 	private static void startHttpExporterService(String hostPortArgs) throws Exception {
 		

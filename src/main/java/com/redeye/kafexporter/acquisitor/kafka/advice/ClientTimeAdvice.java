@@ -6,14 +6,14 @@ import com.redeye.kafexporter.acquisitor.kafka.model.ClientTimeDTO;
 import com.redeye.kafexporter.acquisitor.kafka.stat.TimeStatDaemon;
 
 /**
- * 
+ * kafka 클라이언트의 시간 처리 관련 어드바이스 상위(공통) 클래스
  * 
  * @author jmsohn
  */
 public class ClientTimeAdvice {
 	
 	
-	/** */
+	/** 시간 데이터 전송용 큐 */
 	public static BlockingQueue<ClientTimeDTO> queue;
 	
 	
@@ -27,9 +27,9 @@ public class ClientTimeAdvice {
 	}
 	
 	/**
+	 * 현재 시간을 처리자에게 전송
 	 * 
-	 * 
-	 * @param consumer
+	 * @param consumer 클라이언트 객체
 	 */
 	protected static void sendCurTime(Object consumer) {
 		
