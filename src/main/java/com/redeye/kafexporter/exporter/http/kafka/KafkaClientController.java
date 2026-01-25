@@ -38,15 +38,15 @@ public class KafkaClientController {
 	 * 
 	 * 
 	 * @param exchange
-	 * @param pathList
+	 * @param pathParamList
 	 * @return
 	 */
 	@RequestHandler(path = "/*/config")
-	public String getClientConfig(List<String> pathList) {
+	public String getClientConfig(List<String> pathParamList) {
 		
 		return JSONUtil.toJSON(
 			KafkaAcquisitor.getConfig(
-				pathList.get(0)	// Client Id
+				pathParamList.get(0)	// Client Id
 			)
 		); 
 	}
