@@ -161,7 +161,7 @@ class ControllerContext implements HttpHandler {
 	 */
 	public static class NotFoundException extends Exception {
 
-		/** */
+		/** 클래스 시리얼 번호 */
 		private static final long serialVersionUID = -3843908037266338263L;
 		
 		/**

@@ -143,9 +143,9 @@ public class HandlerDTO {
 		} else if(parameterTypes.length == 2) {
 			
 			if(parameterTypes[0].equals(HttpExchange.class) == true && parameterTypes[1].equals(List.class) == true) {
-				methodType = MethodType.EXCHANGE_PARAM_ONLY;
+				methodType = MethodType.EXCHANGE_PATHLIST_PARAM;
 			} else if(parameterTypes[0].equals(List.class) == true && parameterTypes[1].equals(HttpExchange.class) == true) {
-				methodType = MethodType.PATHLIST_PARAM_ONLY;
+				methodType = MethodType.PATHLIST_EXCHANGE_PARAM;
 			} else {
 				throw new RuntimeException("unexpected param type: " + parameterTypes[0] + ", " + parameterTypes[1]);
 			}
@@ -171,8 +171,7 @@ public class HandlerDTO {
 		}
 		
 		// 1. 패스 매칭 여부 검사
-		String path = exchange.getRequestURI().getPath();
-		String[] pathSegmentAry = path.split("/");
+		String[] pathSegmentAry = getPathSegment(exchange);
 		
 		// 입력된 패스 세그먼트의 수와 패치할 패스 세그먼트 패턴의 개수가 일치하지 않으면 false 반환
 		if(pathSegmentAry.length != this.pathSegmentPatternList.size()) {
@@ -217,12 +216,14 @@ public class HandlerDTO {
 		// 요청 처리 후 응답 변수
 		Object retrival = null;
 		
+		// 예외 로그용 패스 획득
+		String path = exchange.getRequestURI().getPath();
+		
 		// 패스의 변수 값 목록 변수
 		List<String> pathParamList = new ArrayList<>();
 		
 		// Http 요청 패스에서 변수 목록 추출
-		String path = exchange.getRequestURI().getPath();
-		String[] pathSegmentAry = path.split("/");
+		String[] pathSegmentAry = getPathSegment(exchange);
 		
 		if(pathSegmentAry.length != this.pathSegmentPatternList.size()) {
 			throw new RuntimeException("unmatched path exception: " + path + ", " + this.pathPatternStr);
@@ -269,5 +270,21 @@ public class HandlerDTO {
 		
 		// 요청 처리 결과 반환
 		return (retrival != null)?retrival.toString():"";
+	}
+
+	/**
+	 * 패스 세그먼트 목록 추출 후 반환
+	 * 
+	 * @param exchange http 요청/응답 객체
+	 * @return 패스 세그먼트 목록
+	 */
+	private static String[] getPathSegment(HttpExchange exchange) {
+		
+		String path = exchange.getRequestURI().getPath();
+		if(path.startsWith("/") == true) {
+			path = path.substring(1);
+		}
+
+		return path.split("/");
 	}
 }
