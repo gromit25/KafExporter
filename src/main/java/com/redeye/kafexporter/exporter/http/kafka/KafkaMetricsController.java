@@ -27,9 +27,9 @@ public class KafkaMetricsController {
 		
 		Map<String, Object> metricsMap = new HashMap<>();
 		
-		metricsMap.put("system", KafkaAcquisitor.acquireSystemMetrics());
-		metricsMap.put("producer", KafkaAcquisitor.acquireProducerMetrics());
-		metricsMap.put("consumer", KafkaAcquisitor.acquireConsumerMetrics());
+		metricsMap.put("system", KafkaAcquisitor.getSystemMetrics());
+		metricsMap.put("producer", KafkaAcquisitor.getProducerMetrics(null));
+		metricsMap.put("consumer", KafkaAcquisitor.getConsumerMetrics(null));
 		
 		return JSONUtil.toJSON(metricsMap);
 	}
@@ -48,9 +48,9 @@ public class KafkaMetricsController {
 		Map<String, Object> metricsMap = new HashMap<>();
 
 		if("producer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.acquireProducerMetrics());
+			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics());
 		} else if("consumer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.acquireConsumerMetrics());
+			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics());
 		}
 		
 		return JSONUtil.toJSON(metricsMap);
@@ -71,9 +71,9 @@ public class KafkaMetricsController {
 		Map<String, Object> metricsMap = new HashMap<>();
 
 		if("producer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.acquireProducerMetrics(List.of(attr)));
+			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics(List.of(attr)));
 		} else if("consumer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.acquireConsumerMetrics(List.of(attr)));
+			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics(List.of(attr)));
 		}
 		
 		return JSONUtil.toJSON(metricsMap);
