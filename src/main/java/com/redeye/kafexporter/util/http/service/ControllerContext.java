@@ -92,8 +92,8 @@ class ControllerContext implements HttpHandler {
 			HandlerDTO handler = this.getMatchedHandler(exchange);
 			
 			// 핸들러 메소드 호출
-			String response = null;
 			int code = 200;
+			String response = null;
 			
 			try {
 				
