@@ -15,6 +15,18 @@ import com.redeye.kafexporter.util.jmx.JMXService;
  * @author jmsohn
  */
 public class KafkaAcquisitor {
+
+
+	/**
+	 * kafka 클라이언트 타입
+	 * 
+	 * @author jmsohn
+	 */
+	public enum ClientType {
+		NONE,
+		PRODUCER,
+		CONSUMER;
+	}
 	
 
 	/** 프로듀스 설정 값 맵 (key: 클라이언트 아이디, value: 설정 값 맵) */
@@ -47,6 +59,34 @@ public class KafkaAcquisitor {
 		poolTimeStatDaemon.start();
 		commitSyncTimeStatDaemon.start();
 		commitAsyncTimeStatDaemon.start();
+	}
+
+	/**
+	 * 클라이언트 아이디의 타입을 반환
+	 * 
+	 * @param clientId 클라이언트 아이디
+	 * @return 클라이언트 타입
+	 */
+	public static ClientType getClientType(String clientId) {
+		
+		// 프로듀서 클라이언트 아이디일 경우
+		if(
+			Collector.producerConfigMap != null
+			&& Collector.producerConfigMap.containsKey(clientId) == true
+		) {
+			return ClientType.PRODUCER;
+		}
+		
+		// 컨슈머 클라이언트 아이디일 경우
+		if(
+			Collector.consumerConfigMap != null
+			&& Collector.consumerConfigMap.containsKey(clientId) == true
+		) {
+			return ClientType.CONSUMER;
+		}
+		
+		// 둘다 아닐 경우
+		return ClientType.NONE;
 	}
 	
 	/**
@@ -144,6 +184,7 @@ public class KafkaAcquisitor {
 	 * @return 수집된 JMX 성능 정보
 	 */
 	public static Map<String, Map<String, Object>> getSystemMetrics() throws Exception {
+		
 		return Collector.svc.getByQuery(
 			"java.lang:type=OperatingSystem",
 			"SystemCpuLoad",
