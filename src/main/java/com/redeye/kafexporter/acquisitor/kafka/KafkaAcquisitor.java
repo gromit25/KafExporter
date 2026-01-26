@@ -143,8 +143,8 @@ public class KafkaAcquisitor {
 	 * 
 	 * @return 수집된 JMX 성능 정보
 	 */
-	public static Map<String, Map<String, Object>> acquireSystemMetrics() throws Exception {
-		return svc.getByQuery(
+	public static Map<String, Map<String, Object>> getSystemMetrics() throws Exception {
+		return Collector.svc.getByQuery(
 			"java.lang:type=OperatingSystem",
 			"SystemCpuLoad",
 			"FreePhysicalMemorySize"
@@ -152,66 +152,105 @@ public class KafkaAcquisitor {
 	}
 	
 	/**
-	 * Producer JMX 성능 정보 수집
+	 * Broker JMX 성능 정보 수집
 	 * 
-	 * @param attrs 속성명
-	 * @return 수집된 JMX 성능 정보
+	 * @return Broker JMX 성능 정보
 	 */
-	public static Map<String, Map<String, Object>> acquireProducerMetrics(List<String> attrs) throws Exception {
-		return svc.getByQuery(
-			"kafka.producer:client-id=*,type=producer-metrics",
-			attrs.toArray(new String[0])
+	public static Map<String, Map<String, Object>> getBrokerMetrics() throws Exception {
+		
+		List<String> queryList = List.of(
+			"kafka.log:type=*,name=*,topic=*,partition=*",
+			"kafka.server:type=*,name=*",
+			"kafka.controller:type=*,name=*",
+			"kafka.coordinator.group:type=*,name=*",
+			"kafka.network:type=*,name=*"
 		);
+		
+		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
+		
+		for(String query: queryList) {
+			metricsMap.putAll(Collector.svc.getByQuery(query));
+		}
+		
+		return metricsMap;
+	}
+	
+	/**
+	 * JMX 성능 정보 수집
+	 * 
+	 * @param clientId 클라이언트 아이디
+	 * @return JMX 성능 정보
+	 */
+	public static Map<String, Map<String, Object>> getMetrics(String clientId) throws Exception {
+		
+		ClientType clientType = getClientType(clientId);
+		
+		if(ClientType.PRODUCER == clientType) {
+			return getProducerMetrics(clientId);
+		} else if(ClientType.CONSUMER == clientType) {
+			return getConsumerMetrics(clientId);
+		}
+		
+		return Map.of();
 	}
 	
 	/**
 	 * Producer JMX 성능 정보 수집
 	 * 
-	 * @return 수집된 JMX 성능 정보
+	 * @param clientId 클라이언트 아이디
+	 * @return JMX 성능 정보
 	 */
-	public static Map<String, Map<String, Object>> acquireProducerMetrics() throws Exception {
-		return acquireProducerMetrics(
-			List.of(
-				"record-send-rate",
-				"record-error-rate",
-				"request-latency-avg",
-				"request-latency-max",
-				"request-error-rate",
-				"request-error-total",
-				"buffer-total-bytes",
-				"buffer-available-bytes"
-			)
+	public static Map<String, Map<String, Object>> getProducerMetrics(String clientId) throws Exception {
+		
+		// 클라이언트 아이디가 공란이거나 null 이면 모든 클라이언트에 대해 조회
+		if(StringUtil.isBlank(clientId) == true) {
+			clientId = "*";
+		}
+		
+		// 조회 쿼리 목록
+		List<String> queryList = List.of(
+			"kafka.producer:type=producer-metrics,client-id=" + clientId
 		);
+		
+		// 성능 조회
+		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
+		
+		for(String query: queryList) {
+			metricsMap.putAll(Collector.svc.getByQuery(query));
+		}
+		
+		return metricsMap;
 	}
 	
 	/**
-	 * Producer JMX 성능 정보 수집
+	 * Producer JMX 성능 정보 수집<br>
+	 * 클라이언트 아이디가 공란이거나 null 이면 모든 클라이언트에 대해 조회
 	 * 
-	 * @param attrs 속성명
-	 * @return 수집된 JMX 성능 정보
+	 * @param clientId 클라이언트 아이디
+	 * @return JMX 성능 정보
 	 */
-	public static Map<String, Map<String, Object>> acquireConsumerMetrics(List<String> attrs) throws Exception {
-		return svc.getByQuery(
-			"kafka.consumer:client-id=*,type=consumer-metrics",
-			attrs.toArray(new String[0])
+	public static Map<String, Map<String, Object>> getConsumerMetrics(String clientId) throws Exception {
+		
+		// 클라이언트 아이디가 공란이거나 null 이면 모든 클라이언트에 대해 조회
+		if(StringUtil.isBlank(clientId) == true) {
+			clientId = "*";
+		}
+		
+		// 조회 쿼리 목록
+		List<String> queryList = List.of(
+			"kafka.consumer:type=consumer-metrics,client-id=" + clientId,
+			"kafka.consumer:type=consumer-fetch-manager-metrics,client-id=" + clientId,
+			"kafka.consumer:type=consumer-topic-metrics,client-id=" + clientId,
+			"kafka.consumer:type=consumer-coordinator-metrics,client-id=" + clientId
 		);
-	}
-	
-	/**
-	 * Producer JMX 성능 정보 수집
-	 * 
-	 * @return 수집된 JMX 성능 정보
-	 */
-	public static Map<String, Map<String, Object>> acquireConsumerMetrics() throws Exception {
-		return acquireConsumerMetrics(
-			List.of(
-				"records-consumed-rate",
-				"poll-latency-avg",
-				"poll-rate",
-				"commit-latency-avg",
-				"commit-rate",
-				"commit-total"
-			)
-		);
+		
+		// 성능 조회
+		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
+		
+		for(String query: queryList) {
+			metricsMap.putAll(Collector.svc.getByQuery(query));
+		}
+		
+		return metricsMap;
 	}
 }
