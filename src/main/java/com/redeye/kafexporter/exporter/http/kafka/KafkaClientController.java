@@ -28,8 +28,8 @@ public class KafkaClientController {
 		
 		Map<String, Set<String>> clientIdMap = new HashMap<>();
 		
-		clientIdMap.put("producer", KafkaAcquisitor.getProducerClientIdList());
-		clientIdMap.put("consumer", KafkaAcquisitor.getConsumerClientIdList());
+		clientIdMap.put("producer", KafkaAcquisitor.getProducerClientIdSet());
+		clientIdMap.put("consumer", KafkaAcquisitor.getConsumerClientIdSet());
 		
 		return JSONUtil.toJSON(clientIdMap);
 	}
@@ -45,7 +45,7 @@ public class KafkaClientController {
 	public String getClientConfig(List<String> pathParamList) {
 		
 		return JSONUtil.toJSON(
-			KafkaAcquisitor.getConfig(
+			KafkaAcquisitor.getConfigMap(
 				pathParamList.get(0)	// Client Id
 			)
 		); 
