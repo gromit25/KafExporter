@@ -1,5 +1,6 @@
 package com.redeye.kafexporter.acquisitor.kafka;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,16 +72,16 @@ public class KafkaAcquisitor {
 		
 		// 프로듀서 클라이언트 아이디일 경우
 		if(
-			Collector.producerConfigMap != null
-			&& Collector.producerConfigMap.containsKey(clientId) == true
+			KafkaAcquisitor.producerConfigMap != null
+			&& KafkaAcquisitor.producerConfigMap.containsKey(clientId) == true
 		) {
 			return ClientType.PRODUCER;
 		}
 		
 		// 컨슈머 클라이언트 아이디일 경우
 		if(
-			Collector.consumerConfigMap != null
-			&& Collector.consumerConfigMap.containsKey(clientId) == true
+			KafkaAcquisitor.consumerConfigMap != null
+			&& KafkaAcquisitor.consumerConfigMap.containsKey(clientId) == true
 		) {
 			return ClientType.CONSUMER;
 		}
@@ -156,7 +157,7 @@ public class KafkaAcquisitor {
 			return null;
 		}
 		
-		return getConfig(clientId).get(propName);
+		return getConfigMap(clientId).get(propName);
 	}
 
 	/**
@@ -185,7 +186,7 @@ public class KafkaAcquisitor {
 	 */
 	public static Map<String, Map<String, Object>> getSystemMetrics() throws Exception {
 		
-		return Collector.svc.getByQuery(
+		return KafkaAcquisitor.svc.getByQuery(
 			"java.lang:type=OperatingSystem",
 			"SystemCpuLoad",
 			"FreePhysicalMemorySize"
@@ -210,7 +211,7 @@ public class KafkaAcquisitor {
 		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
 		
 		for(String query: queryList) {
-			metricsMap.putAll(Collector.svc.getByQuery(query));
+			metricsMap.putAll(KafkaAcquisitor.svc.getByQuery(query));
 		}
 		
 		return metricsMap;
@@ -257,7 +258,7 @@ public class KafkaAcquisitor {
 		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
 		
 		for(String query: queryList) {
-			metricsMap.putAll(Collector.svc.getByQuery(query));
+			metricsMap.putAll(KafkaAcquisitor.svc.getByQuery(query));
 		}
 		
 		return metricsMap;
@@ -289,7 +290,7 @@ public class KafkaAcquisitor {
 		Map<String, Map<String, Object>> metricsMap = new HashMap<>();
 		
 		for(String query: queryList) {
-			metricsMap.putAll(Collector.svc.getByQuery(query));
+			metricsMap.putAll(KafkaAcquisitor.svc.getByQuery(query));
 		}
 		
 		return metricsMap;
