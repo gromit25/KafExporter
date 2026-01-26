@@ -111,7 +111,7 @@ public class KafkaAcquisitor {
 	 * 
 	 * @return
 	 */
-	public static Set<String> getProducerClientIdList() {
+	public static Set<String> getProducerClientIdSet() {
 		return getProducerConfigMap().keySet();
 	}
 	
@@ -120,7 +120,7 @@ public class KafkaAcquisitor {
 	 * 
 	 * @return
 	 */
-	public static Set<String> getConsumerClientIdList() {
+	public static Set<String> getConsumerClientIdSet() {
 		return getConsumerConfigMap().keySet();
 	}
 	
@@ -130,7 +130,7 @@ public class KafkaAcquisitor {
 	 * @param clientId
 	 * @return
 	 */
-	public static Map<String, Object> getConfig(String clientId) {
+	public static Map<String, Object> getConfigMap(String clientId) {
 		
 		if(producerConfigMap != null && producerConfigMap.containsKey(clientId) == true) {
 			return producerConfigMap.get(clientId);
