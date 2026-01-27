@@ -48,9 +48,9 @@ public class KafkaMetricsController {
 		Map<String, Object> metricsMap = new HashMap<>();
 
 		if("producer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics());
+			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics("*"));
 		} else if("consumer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics());
+			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics("*"));
 		}
 		
 		return JSONUtil.toJSON(metricsMap);
@@ -59,14 +59,14 @@ public class KafkaMetricsController {
 	/**
 	 * 특정 속성에 대한 성능 정보 반환
 	 * 
-	 * @param pathList
+	 * @param pathParamList
 	 * @return
 	 */
 	@RequestHandler(path = "/*/*")
-	public static String getAttrMetrics(List<String> pathList) throws Exception {
+	public static String getAttrMetrics(List<String> pathParamList) throws Exception {
 		
-		String type = pathList.get(0);
-		String attr = pathList.get(1);
+		String type = pathParamList.get(0);
+		String attr = pathParamList.get(1);
 		
 		Map<String, Object> metricsMap = new HashMap<>();
 
