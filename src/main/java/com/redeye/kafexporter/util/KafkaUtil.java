@@ -69,4 +69,96 @@ public class KafkaUtil {
 		
 		return false;
 	}
+
+	/**
+	 * 컨슈머 그룹 목록 반환
+	 * 
+	 * @param adminClient Kafka 클라이언트 객체
+	 * @return 컨슈머 그룹 목록
+	 */
+	public static List<String> getConsumerGroupList(AdminClient adminClient) throws Exception {
+
+		// 컨슈머 그룹 목록 획득
+		Collection<GroupListing> consumerGroupList =
+			adminClient.listGroups().all().get();
+
+		// 컨슈머 그룹 아이이디 목록 생성
+		List<String> groupIdList = new ArrayList<>();
+		
+		for(GroupListing consumerGroup : consumerGroupList) {
+			groupIdList.add(consumerGroup.groupId());
+		}
+
+		return groupIdList;
+    }
+
+	/**
+	 * 컨슈머 래그 맵 반환<br>
+	 * Key: 컨슈머 그룹 아이디, Value: 래그 값
+	 * 
+	 * @param adminClient Kafka 클라이언트 객체
+	 * @return 컨슈머 래그 맵
+	 */
+	public static Map<String, Long> getConsumerLag(AdminClient adminClient) throws Exception {
+		
+		// 컨슈머 래그 맵 생성
+		Map<String, Long> consumerLagMap = new HashMap<>();
+		
+		for(String consumerGroupId: getConsumerGroupList(adminClient)) {
+			consumerLagMap.put(consumerGroupId, getConsumerLag(adminClient, consumerGroupId));
+		}
+		
+		return consumerLagMap;
+	}
+	
+	/**
+	 * 컨슈머 그룹의 lag 계산 및 반환
+	 *
+	 * @param adminClient Kafka 클라이언트 객체
+	 * @param groupId 그룹 아이디
+	 * @return 
+	 */
+	public static long getConsumerLag(AdminClient adminClient, String groupId) throws Exception {
+
+		// 1. 커밋된 오프셋 획득
+		Map<TopicPartition, OffsetAndMetadata> committedOffsets =
+			adminClient
+				.listConsumerGroupOffsets(groupId)
+				.partitionsToOffsetAndMetadata()
+				.get();
+
+		if(committedOffsets.isEmpty() == true) {
+			return 0L;
+		}
+
+		// 2. request latest offsets
+		Map<TopicPartition, OffsetSpec> offsetSpecs = new HashMap<>();
+		for(TopicPartition tp : committedOffsets.keySet()) {
+			offsetSpecs.put(tp, OffsetSpec.latest());
+		}
+
+		Map<TopicPartition, ListOffsetsResultInfo> endOffsets =
+			adminClient
+				.listOffsets(offsetSpecs)
+				.all()
+				.get();
+
+		// 3. 컨슈머 래그 계산
+		long lag = 0L;
+
+		for(Map.Entry<TopicPartition, OffsetAndMetadata> entry : committedOffsets.entrySet()) {
+			
+			TopicPartition tp = entry.getKey();
+			OffsetAndMetadata committed = entry.getValue();
+
+			ListOffsetsResultInfo endOffsetInfo = endOffsets.get(tp);
+			if(endOffsetInfo == null) {
+				continue;
+			}
+
+			lag += Math.max(endOffsetInfo.offset() - committed.offset(), 0);
+		}
+
+		return lag;
+	}
 }
