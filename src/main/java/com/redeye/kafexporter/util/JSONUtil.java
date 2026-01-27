@@ -6,17 +6,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ * JSON 유틸리티 클래스
  * 
  * @author jmsohn
  */
 public class JSONUtil {
 	
 	/**
+	 * Map 객체를 JSON 문자열로 변환하여 반환
 	 * 
-	 * 
-	 * @param map
-	 * @return
+	 * @param map 대상 Map 객체
+	 * @return JSON 문자열
 	 */
 	public static String toJSON(Map<?, ?> map) {
 		
@@ -39,7 +39,7 @@ public class JSONUtil {
 				json.append(", ");
 			}
 			
-			//
+			// Map 항목에 대해 JSON 문자열로 변환하여 추가
 			json
 				.append('"')
 				.append(key.toString())
@@ -55,10 +55,10 @@ public class JSONUtil {
 	}
 	
 	/**
+	 * List 객체를 JSON 문자열로 변환하여 반환
 	 * 
-	 * 
-	 * @param list
-	 * @return
+	 * @param list 대상 Map 객체
+	 * @return JSON 문자열
 	 */
 	public static String toJSON(List<?> list) {
 		
@@ -81,7 +81,7 @@ public class JSONUtil {
 				json.append(", ");
 			}
 			
-			//
+			// List 항목에 대해 JSON 문자열로 변환하여 추가
 			json.append(getJSONValue(value));
 			
 			isFirst = false;
@@ -93,10 +93,10 @@ public class JSONUtil {
 	}
 	
 	/**
+	 * Set 객체를 JSON 문자열로 변환하여 반환
 	 * 
-	 * 
-	 * @param set
-	 * @return
+	 * @param set 대상 Set 객체
+	 * @return JSON 문자열
 	 */
 	public static String toJSON(Set<?> set) {
 		
@@ -105,14 +105,15 @@ public class JSONUtil {
 			return "[]";
 		}
 		
+		// Set을 List 형태로 변환하여 JSON 문자열을 만들어 반환
 		return toJSON(List.of(set.toArray()));
 	}
 	
 	/**
+	 * 항목에 대해 JSON 문자열로 변환하여 추가
 	 * 
-	 * 
-	 * @param obj
-	 * @return
+	 * @param obj 대상 항목
+	 * @return JSON 문자열
 	 */
 	@SuppressWarnings("rawtypes")
 	private static String getJSONValue(Object obj) {
