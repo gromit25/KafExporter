@@ -1,81 +1,76 @@
 package com.redeye.kafexporter.exporter.http.kafka;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.redeye.kafexporter.acquisitor.kafka.KafkaAcquisitor;
-import com.redeye.kafexporter.util.JSONUtil;
-import com.redeye.kafexporter.util.http.service.annotation.Controller;
-import com.redeye.kafexporter.util.http.service.annotation.RequestHandler;
+import com.epozen.emma.exporter.kafka.Collector;
+import com.epozen.emma.exporter.kafka.util.JSONUtil;
+import com.epozen.emma.exporter.kafka.util.http.annotation.Controller;
+import com.epozen.emma.exporter.kafka.util.http.annotation.RequestHandler;
 
 /**
- * 
+ * Kafka 성능 정보 관련 컨트롤러
  * 
  * @author jmsohn
  */
-@Controller(basePath = "/kafka/metrics")
+@Controller(basePath = "/metrics")
 public class KafkaMetricsController {
 	
 	/**
-	 * 성능 정보 반환
+	 * Kafka 전체 성능 정보 반환
 	 * 
-	 * @return
+	 * @return Kafka 전체 성능 정보
 	 */
 	@RequestHandler
 	public static String getMetrics() throws Exception {
 		
 		Map<String, Object> metricsMap = new HashMap<>();
 		
-		metricsMap.put("system", KafkaAcquisitor.getSystemMetrics());
-		metricsMap.put("producer", KafkaAcquisitor.getProducerMetrics(null));
-		metricsMap.put("consumer", KafkaAcquisitor.getConsumerMetrics(null));
+		metricsMap.put("system", Collector.getSystemMetrics());
+		metricsMap.put("broker", Collector.getBrokerMetrics());
+		metricsMap.put("producer", Collector.getProducerMetrics(null));
+		metricsMap.put("consumer", Collector.getConsumerMetrics(null));
 		
 		return JSONUtil.toJSON(metricsMap);
 	}
 	
 	/**
-	 * 특정 속성에 대한 성능 정보 반환
+	 * 브로커 성능 정보 반환
 	 * 
-	 * @param pathList
-	 * @return
+	 * @return 브로커 성능 정보
 	 */
-	@RequestHandler(path = "/*")
-	public static String getTypeMetrics(List<String> pathList) throws Exception {
-		
-		String type = pathList.get(0);
-		
-		Map<String, Object> metricsMap = new HashMap<>();
-
-		if("producer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics("*"));
-		} else if("consumer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics("*"));
-		}
-		
-		return JSONUtil.toJSON(metricsMap);
+	@RequestHandler(path = "/broker")
+	public static String getBrokerMetrics() throws Exception {
+		return JSONUtil.toJSON(Collector.getBrokerMetrics());
 	}
 	
 	/**
-	 * 특정 속성에 대한 성능 정보 반환
+	 * 컨슈머 래그 성능 정보 반환
 	 * 
-	 * @param pathParamList
-	 * @return
+	 * @return 컨슈머 래그 성능 정보
 	 */
-	@RequestHandler(path = "/*/*")
-	public static String getAttrMetrics(List<String> pathParamList) throws Exception {
-		
-		String type = pathParamList.get(0);
-		String attr = pathParamList.get(1);
-		
-		Map<String, Object> metricsMap = new HashMap<>();
-
-		if("producer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getProducerMetrics(List.of(attr)));
-		} else if("consumer".equals(type) == true) {
-			metricsMap.putAll(KafkaAcquisitor.getConsumerMetrics(List.of(attr)));
-		}
-		
-		return JSONUtil.toJSON(metricsMap);
+	@RequestHandler(path = "/broker/lag")
+	public static String getConsumerGroupLag() throws Exception {
+		return JSONUtil.toJSON(Collector.getConsumerLag());
+	}
+	
+	/**
+	 * 프로듀서 성능 정보 반환
+	 * 
+	 * @return 프로듀서 성능 정보
+	 */
+	@RequestHandler(path = "/producer")
+	public static String getProducerMetrics() throws Exception {
+		return JSONUtil.toJSON(Collector.getProducerMetrics("*"));
+	}
+	
+	/**
+	 * 컨슈머 성능 정보 반환
+	 * 
+	 * @return 컨슈머 성능 정보
+	 */
+	@RequestHandler(path = "/consumer")
+	public static String getConsumerMetrics() throws Exception {
+		return JSONUtil.toJSON(Collector.getConsumerMetrics("*"));
 	}
 }
